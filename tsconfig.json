@@ -16,10 +16,10 @@
       "path": "./libs/guard"
     },
     {
-      "path": "./apps/auth"
+      "path": "./libs/constants"
     },
     {
-      "path": "./libs/constants"
+      "path": "./apps/auth-microservice"
     }
   ]
 }

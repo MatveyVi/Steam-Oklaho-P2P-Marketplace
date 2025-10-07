@@ -9,6 +9,7 @@
     "@nestjs/core": "^11.1.6",
     "@nestjs/microservices": "^11.1.6",
     "@nestjs/platform-express": "^11.0.0",
+    "@prisma/client": "^6.17.0",
     "axios": "^1.6.0",
     "kafkajs": "^2.2.4",
     "reflect-metadata": "^0.1.14",
@@ -30,6 +31,7 @@
     "@types/node": "20.19.9",
     "nx": "21.6.3",
     "prettier": "^2.6.2",
+    "prisma": "^6.17.0",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "webpack-cli": "^5.1.4"
