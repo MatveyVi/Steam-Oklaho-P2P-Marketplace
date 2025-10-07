@@ -20,7 +20,12 @@
           "watchDepsName": "watch-deps"
         }
       },
-      "exclude": ["libs/dto/*", "libs/decorator/*", "libs/guard/*"]
+      "exclude": [
+        "libs/dto/*",
+        "libs/decorator/*",
+        "libs/guard/*",
+        "libs/constants/*"
+      ]
     },
     {
       "plugin": "@nx/webpack/plugin",
@@ -35,7 +40,12 @@
     },
     {
       "plugin": "@nx/js/typescript",
-      "include": ["libs/dto/*", "libs/decorator/*", "libs/guard/*"],
+      "include": [
+        "libs/dto/*",
+        "libs/decorator/*",
+        "libs/guard/*",
+        "libs/constants/*"
+      ],
       "options": {
         "typecheck": {
           "targetName": "typecheck"

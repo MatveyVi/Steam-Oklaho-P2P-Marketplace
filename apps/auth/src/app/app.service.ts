@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { LoginUserDto } from '@backend/dto';
 
 @Injectable()
 export class AppService {
-  getData(): { message: string } {
-    return { message: 'Hello API' };
+  async login(dto: LoginUserDto) {
+    return {
+      message: 'Loggined',
+    };
   }
 }
