@@ -5,18 +5,20 @@
   "scripts": {},
   "private": true,
   "dependencies": {
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0",
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/microservices": "^11.1.6",
     "@nestjs/platform-express": "^11.0.0",
     "axios": "^1.6.0",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.0"
+    "reflect-metadata": "^0.1.14",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/schematics": "^11.0.8",
     "@nestjs/testing": "^11.0.0",
     "@nx/js": "21.6.3",
-    "@nx/nest": "21.6.3",
+    "@nx/nest": "^21.6.3",
     "@nx/node": "21.6.3",
     "@nx/web": "21.6.3",
     "@nx/webpack": "21.6.3",

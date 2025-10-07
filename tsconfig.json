@@ -17,6 +17,12 @@
     },
     {
       "path": "./libs/guard"
+    },
+    {
+      "path": "./apps/auth-e2e"
+    },
+    {
+      "path": "./apps/auth"
     }
   ]
 }
