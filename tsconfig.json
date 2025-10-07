@@ -8,6 +8,15 @@
     },
     {
       "path": "./apps/api-gateway"
+    },
+    {
+      "path": "./libs/dto"
+    },
+    {
+      "path": "./libs/decorator"
+    },
+    {
+      "path": "./libs/guard"
     }
   ]
 }
