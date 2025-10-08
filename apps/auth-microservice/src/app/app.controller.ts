@@ -7,12 +7,12 @@ import { LoginUserDto, RegisterUserDto } from '@backend/dto';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @MessagePattern('auth-register')
+  @MessagePattern('auth.register.v1')
   async register(@Payload() dto: RegisterUserDto) {
     return await this.appService.register(dto);
   }
 
-  @MessagePattern('auth-login')
+  @MessagePattern('auth.login.v1')
   async login(@Payload() dto: LoginUserDto) {
     return await this.appService.login(dto);
   }

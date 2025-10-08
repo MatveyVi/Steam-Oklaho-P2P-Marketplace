@@ -9,13 +9,13 @@ export class AuthController {
     @Inject(MICROSERVICE_LIST.AUTH_SERVICE)
     private readonly authClient: ClientProxy
   ) {}
-  @Post('login')
-  async login(@Body() dto: LoginUserDto) {
-    return await this.authClient.send('auth-login', dto);
-  }
-
   @Post('register')
   async register(@Body() dto: RegisterUserDto) {
-    return await this.authClient.send('auth-register', dto);
+    return await this.authClient.send('auth.register.v1', dto);
+  }
+
+  @Post('login')
+  async login(@Body() dto: LoginUserDto) {
+    return await this.authClient.send('auth.login.v1', dto);
   }
 }

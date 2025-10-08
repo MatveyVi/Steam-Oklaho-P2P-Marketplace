@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/jwt"
+    },
+    {
+      "path": "../../libs/database"
+    },
+    {
       "path": "../../libs/dto"
     },
     {

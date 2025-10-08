@@ -4,9 +4,14 @@ import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { AuthController } from '../auth/auth.controller';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
+    ConfigModule,
+    PassportModule,
     ClientsModule.register([
       {
         name: MICROSERVICE_LIST.AUTH_SERVICE,
@@ -28,6 +33,6 @@ import { AuthController } from '../auth/auth.controller';
     ]),
   ],
   controllers: [AppController, AuthController],
-  providers: [AppService],
+  providers: [AppService, JwtStrategy],
 })
 export class AppModule {}
