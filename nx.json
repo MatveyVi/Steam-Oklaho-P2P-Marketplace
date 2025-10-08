@@ -24,7 +24,9 @@
         "libs/dto/*",
         "libs/decorator/*",
         "libs/guard/*",
-        "libs/constants/*"
+        "libs/constants/*",
+        "libs/database/*",
+        "libs/jwt/*"
       ]
     },
     {
@@ -44,7 +46,9 @@
         "libs/dto/*",
         "libs/decorator/*",
         "libs/guard/*",
-        "libs/constants/*"
+        "libs/constants/*",
+        "libs/database/*",
+        "libs/jwt/*"
       ],
       "options": {
         "typecheck": {
