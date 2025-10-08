@@ -14,7 +14,9 @@
   "private": true,
   "dependencies": {
     "@nestjs/common": "^11.1.6",
+    "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.6",
+    "@nestjs/jwt": "^11.0.0",
     "@nestjs/microservices": "^11.1.6",
     "@nestjs/platform-express": "^11.0.0",
     "@prisma/client": "^6.17.0",
