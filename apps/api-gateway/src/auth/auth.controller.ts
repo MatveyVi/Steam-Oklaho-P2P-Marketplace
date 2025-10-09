@@ -19,8 +19,14 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() dto: LoginUserDto) {
-    return await this.authClient.send('auth.login.v1', dto);
+  async login(
+    @Body() dto: LoginUserDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const tokens = await lastValueFrom(
+      this.authClient.send('auth.login.v1', dto)
+    );
+    return this.setRefreshReturnAccess(res, tokens);
   }
 
   @Post('refresh')
@@ -29,13 +35,16 @@ export class AuthController {
     @GetCurrentUser() userId: string,
     @Res({ passthrough: true }) res: Response
   ) {
-    const tokensObservable = this.authClient.send<{
-      accessToken: string;
-      refreshToken: string;
-    }>('auth.refresh.v1', userId);
+    const tokens = await lastValueFrom(
+      this.authClient.send('auth.refresh.v1', userId)
+    );
+    return this.setRefreshReturnAccess(res, tokens);
+  }
 
-    const tokens = await lastValueFrom(tokensObservable);
-
+  private setRefreshReturnAccess(
+    res: Response,
+    tokens: { accessToken: string; refreshToken: string }
+  ) {
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
