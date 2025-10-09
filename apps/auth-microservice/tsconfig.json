@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/exceptions"
+    },
+    {
       "path": "../../libs/jwt"
     },
     {

@@ -26,6 +26,9 @@
     },
     {
       "path": "./libs/jwt"
+    },
+    {
+      "path": "./libs/exceptions"
     }
   ]
 }

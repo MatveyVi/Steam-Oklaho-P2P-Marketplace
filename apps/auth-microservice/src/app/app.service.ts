@@ -1,13 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LoginUserDto, RegisterUserDto } from '@backend/dto';
 import { PrismaService } from '@backend/database';
 import { JwtService } from '@backend/jwt';
 import { hash, verify } from 'argon2';
-import { User } from '@prisma/client';
+import {
+  RpcBadRequestException,
+  RpcUnauthorizedException,
+} from '@backend/exceptions';
 
 @Injectable()
 export class AppService {
@@ -24,8 +23,7 @@ export class AppService {
       },
     });
     if (existingUser)
-      throw new BadRequestException('Пользователь уже существует');
-
+      throw new RpcBadRequestException('Пользователь уже существует');
     const passwordHash = await hash(password);
 
     const newUser = await this.prisma.user.create({
@@ -36,7 +34,7 @@ export class AppService {
       },
     });
 
-    const tokens = await this.generateTokens(newUser);
+    const tokens = await this.generateTokens(newUser.id);
 
     // TODO Emit in kafka
 
@@ -50,22 +48,38 @@ export class AppService {
         email,
       },
     });
-    if (!user) throw new UnauthorizedException('Неверный логин или пароль');
+    if (!user) throw new RpcUnauthorizedException('Неверный логин или пароль');
     const isPassValid = await verify(user.passwordHash, password);
     if (!isPassValid)
-      throw new UnauthorizedException('Неверный логин или пароль');
-    const tokens = await this.generateTokens(user);
+      throw new RpcUnauthorizedException('Неверный логин или пароль');
+    const tokens = await this.generateTokens(user.id);
 
     return tokens;
   }
 
-  private async generateTokens(user: User) {
+  async refreshTokens(userId: string) {
+    const user = this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (!user)
+      throw new RpcUnauthorizedException('Недействительный пользователь');
+
+    const tokens = await this.generateTokens(userId);
+
+    return tokens;
+  }
+
+  private async generateTokens(userId: string) {
     const accessToken = await this.jwtService.generateAccessToken({
-      sub: user.id,
-      email: user.email,
+      sub: userId,
     });
     const refreshToken = await this.jwtService.generateRefreshToken({
-      sub: user.id,
+      sub: userId,
     });
 
     return { accessToken, refreshToken };

@@ -10,10 +10,7 @@ export class JwtService {
     @Inject(jwtConfig.KEY) private readonly config: ConfigType<typeof jwtConfig>
   ) {}
 
-  async generateAccessToken(payload: {
-    sub: string;
-    email: string;
-  }): Promise<String> {
+  async generateAccessToken(payload: { sub: string }): Promise<String> {
     return this.nestJwtService.signAsync(payload, {
       secret: this.config.access.secret,
       expiresIn: this.config.access.expiration,

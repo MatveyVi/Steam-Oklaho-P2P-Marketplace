@@ -13,6 +13,9 @@
   "exclude": [],
   "references": [
     {
+      "path": "../../libs/exceptions/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/jwt/tsconfig.lib.json"
     },
     {
