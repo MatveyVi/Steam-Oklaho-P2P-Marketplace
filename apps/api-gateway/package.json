@@ -77,5 +77,8 @@
       }
     }
   },
-  "dependencies": {}
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "@types/passport-jwt": "^4.0.1"
+  }
 }

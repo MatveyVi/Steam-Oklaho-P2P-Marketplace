@@ -19,7 +19,16 @@
           "buildDepsName": "build-deps",
           "watchDepsName": "watch-deps"
         }
-      }
+      },
+      "exclude": [
+        "libs/dto/*",
+        "libs/decorator/*",
+        "libs/guard/*",
+        "libs/constants/*",
+        "libs/database/*",
+        "libs/jwt/*",
+        "libs/exceptions/*"
+      ]
     },
     {
       "plugin": "@nx/webpack/plugin",
@@ -30,6 +39,23 @@
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps",
         "serveStaticTargetName": "serve-static"
+      }
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "libs/dto/*",
+        "libs/decorator/*",
+        "libs/guard/*",
+        "libs/constants/*",
+        "libs/database/*",
+        "libs/jwt/*",
+        "libs/exceptions/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
       }
     }
   ]

@@ -4,10 +4,31 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/api-gateway-e2e"
+      "path": "./apps/api-gateway"
     },
     {
-      "path": "./apps/api-gateway"
+      "path": "./libs/dto"
+    },
+    {
+      "path": "./libs/decorator"
+    },
+    {
+      "path": "./libs/guard"
+    },
+    {
+      "path": "./libs/constants"
+    },
+    {
+      "path": "./apps/auth-microservice"
+    },
+    {
+      "path": "./libs/database"
+    },
+    {
+      "path": "./libs/jwt"
+    },
+    {
+      "path": "./libs/exceptions"
     }
   ]
 }
