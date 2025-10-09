@@ -41,6 +41,12 @@ export class AuthController {
     return this.setRefreshReturnAccess(res, tokens);
   }
 
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('refreshToken');
+    return { success: true };
+  }
+
   private setRefreshReturnAccess(
     res: Response,
     tokens: { accessToken: string; refreshToken: string }
