@@ -31,9 +31,6 @@
       "path": "./libs/exceptions"
     },
     {
-      "path": "./apps/user-service-e2e"
-    },
-    {
       "path": "./apps/user-service"
     }
   ]

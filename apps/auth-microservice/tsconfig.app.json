@@ -16,6 +16,9 @@
       "path": "../../libs/exceptions/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/constants/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/jwt/tsconfig.lib.json"
     },
     {

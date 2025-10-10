@@ -1,18 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { LoginUserDto, RegisterUserDto } from '@backend/dto';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  LoginUserDto,
+  RegisterUserDto,
+  UserRegisteredEvent,
+} from '@backend/dto';
 import { PrismaService } from '@backend/database';
 import { JwtService } from '@backend/jwt';
 import { hash, verify } from 'argon2';
+import { MICROSERVICE_LIST } from '@backend/constants';
 import {
   RpcBadRequestException,
   RpcUnauthorizedException,
 } from '@backend/exceptions';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    @Inject(MICROSERVICE_LIST.KAFKA_SERVICE)
+    private readonly kafkaClient: ClientProxy
   ) {}
 
   async register(dto: RegisterUserDto) {
@@ -32,11 +40,21 @@ export class AppService {
         email,
         passwordHash,
       },
+      select: {
+        id: true,
+        email: true,
+      },
     });
 
     const tokens = await this.generateTokens(newUser.id);
 
-    // TODO Emit in kafka
+    const eventPayload = new UserRegisteredEvent(
+      newUser.id,
+      newUser.email,
+      new Date().toISOString()
+    );
+
+    this.kafkaClient.emit('user.registered.v1', eventPayload);
 
     return tokens;
   }
