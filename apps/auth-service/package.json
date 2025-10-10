@@ -1,5 +1,5 @@
 {
-  "name": "@backend/auth-microservice",
+  "name": "@backend/auth-service",
   "version": "0.0.1",
   "private": true,
   "nx": {
@@ -11,7 +11,7 @@
           "args": [
             "--node-env=production"
           ],
-          "cwd": "apps/auth-microservice"
+          "cwd": "apps/auth-service"
         },
         "configurations": {
           "development": {
@@ -28,8 +28,8 @@
         "cache": true,
         "executor": "@nx/js:prune-lockfile",
         "outputs": [
-          "{workspaceRoot}/apps/auth-microservice/dist/package.json",
-          "{workspaceRoot}/apps/auth-microservice/dist/package-lock.json"
+          "{workspaceRoot}/apps/auth-service/dist/package.json",
+          "{workspaceRoot}/apps/auth-service/dist/package-lock.json"
         ],
         "options": {
           "buildTarget": "build"
@@ -41,7 +41,7 @@
         ],
         "cache": true,
         "outputs": [
-          "{workspaceRoot}/apps/auth-microservice/dist/workspace_modules"
+          "{workspaceRoot}/apps/auth-service/dist/workspace_modules"
         ],
         "executor": "@nx/js:copy-workspace-modules",
         "options": {
@@ -63,15 +63,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@backend/auth-microservice:build",
+          "buildTarget": "@backend/auth-service:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "@backend/auth-microservice:build:development"
+            "buildTarget": "@backend/auth-service:build:development"
           },
           "production": {
-            "buildTarget": "@backend/auth-microservice:build:production"
+            "buildTarget": "@backend/auth-service:build:production"
           }
         }
       }

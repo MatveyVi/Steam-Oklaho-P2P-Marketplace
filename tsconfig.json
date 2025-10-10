@@ -19,7 +19,7 @@
       "path": "./libs/constants"
     },
     {
-      "path": "./apps/auth-microservice"
+      "path": "./apps/auth-service"
     },
     {
       "path": "./libs/database"
