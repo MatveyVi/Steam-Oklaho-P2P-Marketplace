@@ -18,4 +18,22 @@ export class AppService {
       },
     });
   }
+
+  async getProfileById(userId: string) {
+    return this.prismaService.profile.findUnique({
+      where: {
+        userId,
+      },
+      select: {
+        userId: true,
+        email: true,
+        nickname: true,
+        avatarUrl: true,
+        bio: true,
+        tradeUrl: true,
+        rating: true,
+        createdAt: true,
+      },
+    });
+  }
 }

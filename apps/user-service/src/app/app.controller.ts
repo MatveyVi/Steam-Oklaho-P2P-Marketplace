@@ -1,6 +1,6 @@
 import { Controller, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { UserRegisteredEvent } from '@backend/dto';
 
 @Controller()
@@ -13,5 +13,11 @@ export class AppController {
   async handleUserRegistered(@Payload() data: UserRegisteredEvent) {
     this.logger.log(`Получена регистрация нового пользователя: ${data.email}`);
     return this.appService.createProfile(data);
+  }
+
+  @MessagePattern('users.get-profile-by-id.v1')
+  async getProfileById(@Payload() userId: string) {
+    console.log('user-service');
+    return this.appService.getProfileById(userId);
   }
 }

@@ -23,9 +23,17 @@ async function bootstrap() {
     },
   });
 
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      host: 'localhost',
+      port: 4002,
+    },
+  });
+
   await app.startAllMicroservices();
 
-  const port = process.env.PORT || 4002;
+  const port = process.env.PORT || 3001;
   await app.listen(port);
 
   Logger.log(`🚀 User Service is running on: http://localhost:${port}`);
