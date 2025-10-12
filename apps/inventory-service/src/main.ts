@@ -10,17 +10,19 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: 'localhost',
-      port: 4003,
+      port: 4004,
     },
   });
 
-  await app.startAllMicroservices();
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3003;
+
+  await app.startAllMicroservices();
+
+  const port = process.env.PORT || 3004;
   await app.listen(port);
   Logger.log(
-    `🚀 Catalog Service is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Inventory Service is running on: http://localhost:${port}/${globalPrefix}`
   );
 }
 

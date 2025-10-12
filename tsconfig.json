@@ -35,6 +35,9 @@
     },
     {
       "path": "./apps/catalog-service"
+    },
+    {
+      "path": "./apps/inventory-service"
     }
   ]
 }

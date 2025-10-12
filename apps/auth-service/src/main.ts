@@ -4,17 +4,25 @@ import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.TCP,
-      options: {
-        port: 4001,
-      },
-    }
+  const app = await NestFactory.create(AppModule);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      port: 4001,
+    },
+  });
+
+  const globalPrefix = 'api';
+  app.setGlobalPrefix(globalPrefix);
+
+  await app.startAllMicroservices();
+
+  const port = process.env.PORT || 3001;
+
+  await app.listen(port);
+  Logger.log(
+    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
   );
-  await app.listen();
-  Logger.log(`🚀 Auth Service is listening on TCP port 4001`);
 }
 
 bootstrap();

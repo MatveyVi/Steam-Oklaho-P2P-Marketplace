@@ -1,5 +1,6 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { AppService } from './app.service';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('items')
 export class AppController {
@@ -16,5 +17,10 @@ export class AppController {
     if (!item)
       throw new NotFoundException('Предмет с таким externalId не найден');
     return item;
+  }
+
+  @MessagePattern('catalog.find-by-external-id.v1')
+  async findByExternalId(@Payload() externalId: string) {
+    return this.appService.findByExternalId(externalId);
   }
 }
