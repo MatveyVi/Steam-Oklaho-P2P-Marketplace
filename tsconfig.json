@@ -35,6 +35,12 @@
     },
     {
       "path": "./apps/catalog-service"
+    },
+    {
+      "path": "./apps/inventory-service-e2e"
+    },
+    {
+      "path": "./apps/inventory-service"
     }
   ]
 }

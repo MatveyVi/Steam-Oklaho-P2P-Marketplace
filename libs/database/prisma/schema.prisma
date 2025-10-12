@@ -41,7 +41,6 @@ model BaseItem {
   description String
   imageUrl    String
   rarity      String
-  quality     String
   type        String
   collection  String
 }
