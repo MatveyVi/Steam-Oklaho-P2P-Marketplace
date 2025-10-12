@@ -15,9 +15,15 @@ export class AppController {
     return this.appService.createProfile(data);
   }
 
-  @MessagePattern('users.get-profile-by-id.v1')
-  async getProfileById(@Payload() userId: string) {
-    console.log('user-service');
-    return this.appService.getProfileById(userId);
+  @MessagePattern('user.get-profile-by-id.v1')
+  async handleGetProfileById(@Payload() userId: string) {
+    this.logger.log(`Получена запрос на профиль пользователя: ${userId}`);
+    return this.appService.findProfileById(userId);
+  }
+
+  @MessagePattern('user.get-profile-by-nickname.v1')
+  async handleGetProfileByNickname(@Payload() nickname: string) {
+    this.logger.log(`Получена запрос на профиль пользователя: ${nickname}`);
+    return this.appService.findProfileByNickname(nickname);
   }
 }

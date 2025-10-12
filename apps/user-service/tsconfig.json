@@ -4,10 +4,13 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/dto"
+      "path": "../../libs/exceptions"
     },
     {
       "path": "../../libs/database"
+    },
+    {
+      "path": "../../libs/dto"
     },
     {
       "path": "./tsconfig.app.json"

@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
+import { Body, Controller, Inject, Logger, Post, Res } from '@nestjs/common';
 import { LoginUserDto, RegisterUserDto } from '@backend/dto';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
@@ -11,10 +11,12 @@ import { lastValueFrom } from 'rxjs';
 export class AuthController {
   constructor(
     @Inject(MICROSERVICE_LIST.AUTH_SERVICE)
-    private readonly authClient: ClientProxy
+    private readonly authClient: ClientProxy,
+    private readonly logger: Logger
   ) {}
   @Post('register')
   async register(@Body() dto: RegisterUserDto) {
+    this.logger.log(`Запрос на регистрацию от ${dto.email}`);
     return await this.authClient.send('auth.register.v1', dto);
   }
 
@@ -23,6 +25,7 @@ export class AuthController {
     @Body() dto: LoginUserDto,
     @Res({ passthrough: true }) res: Response
   ) {
+    this.logger.log(`Запрос на логин от ${dto.email}`);
     const tokens = await lastValueFrom(
       this.authClient.send('auth.login.v1', dto)
     );
@@ -35,6 +38,7 @@ export class AuthController {
     @GetCurrentUser() userId: string,
     @Res({ passthrough: true }) res: Response
   ) {
+    this.logger.log(`Запрос на refresh от ${userId}`);
     const tokens = await lastValueFrom(
       this.authClient.send('auth.refresh.v1', userId)
     );
@@ -43,6 +47,7 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) res: Response) {
+    this.logger.log(`Запрос на логаут`);
     res.clearCookie('refreshToken');
     return { success: true };
   }

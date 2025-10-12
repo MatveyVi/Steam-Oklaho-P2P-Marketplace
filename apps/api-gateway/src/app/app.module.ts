@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -43,6 +43,6 @@ import { UserController } from '../users/user.controller';
     ]),
   ],
   controllers: [AppController, AuthController, UserController],
-  providers: [AppService, JwtStrategy, JwtRefreshStrategy],
+  providers: [AppService, JwtStrategy, JwtRefreshStrategy, Logger],
 })
 export class AppModule {}

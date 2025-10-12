@@ -13,10 +13,13 @@
   "exclude": [],
   "references": [
     {
-      "path": "../../libs/dto/tsconfig.lib.json"
+      "path": "../../libs/exceptions/tsconfig.lib.json"
     },
     {
       "path": "../../libs/database/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/dto/tsconfig.lib.json"
     }
   ]
 }

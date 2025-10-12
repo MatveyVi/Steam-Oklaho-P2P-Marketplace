@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@backend/database';
-import { UserRegisteredEvent } from '@backend/dto';
+import { RpcBadRequestException } from '@backend/exceptions';
+import {
+  MyProfileResponseDto,
+  ProfileResponseDto,
+  UserRegisteredEvent,
+} from '@backend/dto';
+import {} from '@backend/dto';
 
 @Injectable()
 export class AppService {
@@ -10,7 +16,7 @@ export class AppService {
     const { userId, email } = data;
     const defaultNickName = email.split('@')[0];
 
-    return this.prismaService.profile.create({
+    return await this.prismaService.profile.create({
       data: {
         userId,
         email,
@@ -19,14 +25,13 @@ export class AppService {
     });
   }
 
-  async getProfileById(userId: string) {
-    return this.prismaService.profile.findUnique({
+  async findProfileById(userId: string): Promise<MyProfileResponseDto> {
+    const user = await this.prismaService.profile.findUnique({
       where: {
-        userId,
+        userId: userId,
       },
       select: {
         userId: true,
-        email: true,
         nickname: true,
         avatarUrl: true,
         bio: true,
@@ -35,5 +40,25 @@ export class AppService {
         createdAt: true,
       },
     });
+    if (!user) throw new RpcBadRequestException('Профиль не существует');
+    return user;
+  }
+
+  async findProfileByNickname(nickname: string): Promise<ProfileResponseDto> {
+    const user = await this.prismaService.profile.findUnique({
+      where: {
+        nickname: nickname,
+      },
+      select: {
+        id: true,
+        nickname: true,
+        avatarUrl: true,
+        bio: true,
+        rating: true,
+        createdAt: true,
+      },
+    });
+    if (!user) throw new RpcBadRequestException('Профиль не существует');
+    return user;
   }
 }
