@@ -45,30 +45,13 @@ export class AppService {
   }
 
   async getItemsById(userId: string) {
-    this.logger.log(`Получаем предметы в инветаре пользвоателя ${userId}`);
+    this.logger.log(`Получаем предметы в инветаре пользователя ${userId}`);
     const itemsInstance: Item[] = await this.prismaService.item.findMany({
       where: {
         ownerId: userId,
       },
     });
     if (!itemsInstance || itemsInstance.length === 0) return [];
-
-    const fullItems = await Promise.all(
-      itemsInstance.map(async (instance) => {
-        try {
-          const response = await lastValueFrom(
-            this.httpService.get(`items/${instance.externalId}`)
-          );
-          const baseItem = response.data;
-          return { ...instance, ...baseItem };
-        } catch (error) {
-          this.logger.log(
-            `Ошибка при получении данных об ${instance.externalId}`
-          );
-          return instance;
-        }
-      })
-    );
-    return fullItems;
+    return itemsInstance;
   }
 }

@@ -4,13 +4,15 @@ import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { Auth } from '../app/decorators/auth.decorator';
 import { GetCurrentUser } from '../app/decorators/get-current-user.decorator';
+import { InventoryService } from './inventory.service';
 
 @Controller('inventory')
 export class InventoryController {
   constructor(
     @Inject(MICROSERVICE_LIST.INVENTORY_SERVICE)
     private readonly inventoryClient: ClientProxy,
-    private readonly logger: Logger
+    private readonly logger: Logger,
+    private readonly inventoryService: InventoryService
   ) {}
 
   @Post('test/add-item')
@@ -22,9 +24,6 @@ export class InventoryController {
   @Auth()
   getUserItems(@GetCurrentUser() userId: string) {
     this.logger.log(`Запрос на получение инвентаря от ${userId}`);
-    return this.inventoryClient.send(
-      'inventory.get-items-by-user-id.v1',
-      userId
-    );
+    return this.inventoryService.getUserItems(userId);
   }
 }

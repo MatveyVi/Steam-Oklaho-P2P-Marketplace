@@ -12,6 +12,7 @@ import { UserController } from '../users/user.controller';
 import { HttpModule } from '@nestjs/axios';
 import { CatalogController } from '../catalog/catalog.controller';
 import { InventoryController } from '../inventory/inventory.controller';
+import { InventoryService } from '../inventory/inventory.service';
 
 @Module({
   imports: [
@@ -63,6 +64,12 @@ import { InventoryController } from '../inventory/inventory.controller';
     CatalogController,
     InventoryController,
   ],
-  providers: [AppService, JwtStrategy, JwtRefreshStrategy, Logger],
+  providers: [
+    AppService,
+    InventoryService,
+    JwtStrategy,
+    JwtRefreshStrategy,
+    Logger,
+  ],
 })
 export class AppModule {}
