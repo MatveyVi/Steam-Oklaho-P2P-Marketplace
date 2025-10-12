@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -8,6 +8,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { UserController } from '../users/user.controller';
 
 @Module({
   imports: [
@@ -23,6 +24,14 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
         },
       },
       {
+        name: MICROSERVICE_LIST.USER_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 4002,
+        },
+      },
+      {
         name: MICROSERVICE_LIST.KAFKA_SERVICE,
         transport: Transport.KAFKA,
         options: {
@@ -33,7 +42,7 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
       },
     ]),
   ],
-  controllers: [AppController, AuthController],
-  providers: [AppService, JwtStrategy, JwtRefreshStrategy],
+  controllers: [AppController, AuthController, UserController],
+  providers: [AppService, JwtStrategy, JwtRefreshStrategy, Logger],
 })
 export class AppModule {}

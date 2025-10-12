@@ -7,9 +7,6 @@
       "path": "../../libs/exceptions"
     },
     {
-      "path": "../../libs/jwt"
-    },
-    {
       "path": "../../libs/database"
     },
     {
