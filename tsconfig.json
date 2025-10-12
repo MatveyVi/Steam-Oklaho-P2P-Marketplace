@@ -32,6 +32,9 @@
     },
     {
       "path": "./apps/user-service"
+    },
+    {
+      "path": "./apps/catalog-service"
     }
   ]
 }
