@@ -44,3 +44,23 @@ model BaseItem {
   type        String
   collection  String
 }
+
+model Item {
+  id      String @id @default(cuid())
+  ownerId String
+
+  externalId String
+
+  float   Float?
+  pattern Int?
+
+  status StatusEnum @default(AVAILABLE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum StatusEnum {
+  AVAILABLE
+  LISTED
+}

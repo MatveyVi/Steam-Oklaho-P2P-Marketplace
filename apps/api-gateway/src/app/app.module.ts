@@ -11,13 +11,14 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { UserController } from '../users/user.controller';
 import { HttpModule } from '@nestjs/axios';
 import { CatalogController } from '../catalog/catalog.controller';
+import { InventoryController } from '../inventory/inventory.controller';
 
 @Module({
   imports: [
     ConfigModule,
     PassportModule,
     HttpModule.register({
-      baseURL: 'http://localhost:4003/api',
+      baseURL: 'http://localhost:3003/api',
     }),
     ClientsModule.register([
       {
@@ -33,7 +34,7 @@ import { CatalogController } from '../catalog/catalog.controller';
         transport: Transport.TCP,
         options: {
           host: 'localhost',
-          port: 4002,
+          port: 4005,
         },
       },
       {
@@ -45,6 +46,14 @@ import { CatalogController } from '../catalog/catalog.controller';
           },
         },
       },
+      {
+        name: MICROSERVICE_LIST.INVENTORY_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 4004,
+        },
+      },
     ]),
   ],
   controllers: [
@@ -52,6 +61,7 @@ import { CatalogController } from '../catalog/catalog.controller';
     AuthController,
     UserController,
     CatalogController,
+    InventoryController,
   ],
   providers: [AppService, JwtStrategy, JwtRefreshStrategy, Logger],
 })

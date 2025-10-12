@@ -1,8 +1,3 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
@@ -27,16 +22,16 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: 'localhost',
-      port: 4002,
+      port: 4005,
     },
   });
 
   await app.startAllMicroservices();
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 3005;
   await app.listen(port);
 
-  Logger.log(`🚀 User Service is listening on TCP port 4002`);
+  Logger.log(`🚀 User Service is listening on TCP port 4005`);
 }
 
 bootstrap();
