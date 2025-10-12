@@ -9,11 +9,16 @@ import { ConfigModule } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { UserController } from '../users/user.controller';
+import { HttpModule } from '@nestjs/axios';
+import { CatalogController } from '../catalog/catalog.controller';
 
 @Module({
   imports: [
     ConfigModule,
     PassportModule,
+    HttpModule.register({
+      baseURL: 'http://localhost:4003/api',
+    }),
     ClientsModule.register([
       {
         name: MICROSERVICE_LIST.AUTH_SERVICE,
@@ -42,7 +47,12 @@ import { UserController } from '../users/user.controller';
       },
     ]),
   ],
-  controllers: [AppController, AuthController, UserController],
+  controllers: [
+    AppController,
+    AuthController,
+    UserController,
+    CatalogController,
+  ],
   providers: [AppService, JwtStrategy, JwtRefreshStrategy, Logger],
 })
 export class AppModule {}

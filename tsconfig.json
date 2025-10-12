@@ -34,9 +34,6 @@
       "path": "./apps/user-service"
     },
     {
-      "path": "./apps/catalog-service-e2e"
-    },
-    {
       "path": "./apps/catalog-service"
     }
   ]
