@@ -31,6 +31,13 @@ export class MarketController {
     return this.marketClient.send('market.get-all-listings.v1', paginationDto);
   }
 
+  @Get('listings/:listingId')
+  @Auth()
+  async getListingById(@Param('listingId') listingId: string) {
+    this.logger.log(`Получен запрос на получение листинга ${listingId}`);
+    return this.marketClient.send('market.get-listing-by-id.v1', listingId);
+  }
+
   @Auth()
   @Post('listings')
   async createListing(

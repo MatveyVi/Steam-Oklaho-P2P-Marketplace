@@ -18,6 +18,12 @@ export class AppController {
     return this.appService.getAllListings(pagination);
   }
 
+  @MessagePattern('market.get-listing-by-id.v1')
+  handleGetListingById(@Payload() listingId: string) {
+    this.logger.log(`Получен запрос на получение листинга ${listingId}`);
+    return this.appService.getListingById(listingId);
+  }
+
   @MessagePattern('market.create-listing.v1')
   handleCreateListing(
     @Payload() data: { userId: string; dto: CreateListingDto }

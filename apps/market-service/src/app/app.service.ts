@@ -52,6 +52,14 @@ export class AppService {
     };
   }
 
+  async getListingById(listingId: string) {
+    return this.prismaService.listing.findUnique({
+      where: {
+        id: listingId,
+      },
+    });
+  }
+
   async createListing(sellerId: string, dto: CreateListingDto) {
     this.logger.log(`Запрос на выставление на продажу предмета ${dto.itemId}`);
 
