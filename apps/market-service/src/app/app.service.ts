@@ -1,9 +1,12 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { CreateListingDto } from '@backend/dto';
+import { CreateListingDto, EditListingDto } from '@backend/dto';
 import { lastValueFrom } from 'rxjs';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
-import { RpcBadRequestException } from '@backend/exceptions';
+import {
+  RpcBadRequestException,
+  RpcForbiddenException,
+} from '@backend/exceptions';
 import { PrismaService } from '@backend/database';
 
 @Injectable()
@@ -37,6 +40,28 @@ export class AppService {
         sellerId,
         price: dto.price,
         status: 'ACTIVE',
+      },
+    });
+  }
+
+  async editListing(sellerId: string, listingId: string, dto: EditListingDto) {
+    this.logger.log(`Запрос на изменение предмета ${listingId}}`);
+    const listing = await this.prismaService.listing.findUnique({
+      where: {
+        id: listingId,
+      },
+    });
+    if (!listing) throw new RpcBadRequestException('Предмет не найден');
+
+    if (listing.sellerId !== sellerId)
+      throw new RpcForbiddenException('Вы не владеете этим предметом');
+
+    return await this.prismaService.listing.update({
+      where: {
+        id: listingId,
+      },
+      data: {
+        price: dto.price,
       },
     });
   }

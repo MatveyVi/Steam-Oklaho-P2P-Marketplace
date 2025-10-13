@@ -1,6 +1,6 @@
 import { Controller, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreateListingDto } from '@backend/dto';
+import { CreateListingDto, EditListingDto } from '@backend/dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
@@ -16,5 +16,13 @@ export class AppController {
   ) {
     this.logger.log(`Получен запрос на листинг предмета ${data.dto.itemId}`);
     return this.appService.createListing(data.userId, data.dto);
+  }
+
+  @MessagePattern('market.edit-listing.v1')
+  handleEditListing(
+    @Payload() data: { userId: string; listingId: string; dto: EditListingDto }
+  ) {
+    this.logger.log(`Получен запрос на изменение предмета ${data.listingId}`);
+    return this.appService.editListing(data.userId, data.listingId, data.dto);
   }
 }
