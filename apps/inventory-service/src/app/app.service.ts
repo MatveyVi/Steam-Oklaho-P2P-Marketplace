@@ -4,9 +4,13 @@ import { PrismaService } from '@backend/database';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
-import { RpcBadRequestException } from '@backend/exceptions';
+import {
+  RpcBadRequestException,
+  RpcConflictException,
+  RpcForbiddenException,
+  RpcNotFoundException,
+} from '@backend/exceptions';
 import { Item } from '@prisma/client';
-import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AppService {
@@ -14,8 +18,7 @@ export class AppService {
     private readonly prismaService: PrismaService,
     private readonly logger: Logger,
     @Inject(MICROSERVICE_LIST.CATALOG_SERVICE)
-    private readonly catalogClient: ClientProxy,
-    private readonly httpService: HttpService
+    private readonly catalogClient: ClientProxy
   ) {}
 
   async addFakeItem(dto: AddFakeItemDto) {
@@ -53,5 +56,47 @@ export class AppService {
     });
     if (!itemsInstance || itemsInstance.length === 0) return [];
     return itemsInstance;
+  }
+
+  async lockItem(dto: { userId: string; itemId: string }) {
+    const item = await this.prismaService.item.findUnique({
+      where: {
+        id: dto.itemId,
+      },
+    });
+    if (!item) throw new RpcNotFoundException('Предмет не найден');
+    if (item.ownerId !== dto.userId)
+      throw new RpcForbiddenException('Вы не владеете этим предметом');
+    if (item.status !== 'AVAILABLE')
+      throw new RpcConflictException('Предмет уже стоит на продаже');
+    await this.prismaService.item.update({
+      where: {
+        id: dto.itemId,
+      },
+      data: {
+        status: 'LISTED',
+      },
+    });
+  }
+
+  async unlockItem(dto: { userId: string; itemId: string }) {
+    const item = await this.prismaService.item.findUnique({
+      where: {
+        id: dto.itemId,
+      },
+    });
+    if (!item) throw new RpcNotFoundException('Предмет не найден');
+    if (item.ownerId !== dto.userId)
+      throw new RpcForbiddenException('Вы не владеете этим предметом');
+    if (item.status !== 'LISTED')
+      throw new RpcConflictException('Предмет не стоит на продаже');
+    await this.prismaService.item.update({
+      where: {
+        id: dto.itemId,
+      },
+      data: {
+        status: 'AVAILABLE',
+      },
+    });
   }
 }
