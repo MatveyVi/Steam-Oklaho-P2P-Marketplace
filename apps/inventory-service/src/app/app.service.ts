@@ -78,4 +78,25 @@ export class AppService {
       },
     });
   }
+
+  async unlockItem(dto: { userId: string; itemId: string }) {
+    const item = await this.prismaService.item.findUnique({
+      where: {
+        id: dto.itemId,
+      },
+    });
+    if (!item) throw new RpcNotFoundException('Предмет не найден');
+    if (item.ownerId !== dto.userId)
+      throw new RpcForbiddenException('Вы не владеете этим предметом');
+    if (item.status !== 'LISTED')
+      throw new RpcConflictException('Предмет не стоит на продаже');
+    await this.prismaService.item.update({
+      where: {
+        id: dto.itemId,
+      },
+      data: {
+        status: 'AVAILABLE',
+      },
+    });
+  }
 }

@@ -65,4 +65,42 @@ export class AppService {
       },
     });
   }
+
+  async deleteListing(sellerId: string, listingId: string) {
+    this.logger.log(`Запрос на удаление предмета ${listingId}}`);
+
+    const listing = await this.prismaService.listing.findUnique({
+      where: {
+        id: listingId,
+      },
+    });
+
+    if (!listing) throw new RpcBadRequestException('Предмет не найден');
+
+    if (listing.sellerId !== sellerId)
+      throw new RpcForbiddenException('Вы не владеете этим предметом');
+
+    try {
+      await lastValueFrom(
+        this.inventoryClient.send('inventory.unlock-item.v1', {
+          userId: sellerId,
+          itemId: listing.itemId,
+        })
+      );
+      this.logger.log(
+        `Предмет ${listing.itemId} успешно разблокирован в инвентаре`
+      );
+    } catch (error: any) {
+      this.logger.error(`Не удалось разблокировать предмет: ${error.message}`);
+      throw new RpcBadRequestException(
+        `Не удалось снять предмет с продажу: ${error.message}`
+      );
+    }
+
+    return await this.prismaService.listing.delete({
+      where: {
+        id: listingId,
+      },
+    });
+  }
 }

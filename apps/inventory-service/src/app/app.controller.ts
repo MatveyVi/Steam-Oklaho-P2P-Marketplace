@@ -26,4 +26,10 @@ export class AppController {
     await this.appService.lockItem(data);
     return { success: true };
   }
+
+  @MessagePattern('inventory.unlock-item.v1')
+  async handleUnlockItem(@Payload() data: { userId: string; itemId: string }) {
+    await this.appService.unlockItem(data);
+    return { success: true };
+  }
 }

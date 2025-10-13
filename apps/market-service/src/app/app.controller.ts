@@ -25,4 +25,10 @@ export class AppController {
     this.logger.log(`Получен запрос на изменение предмета ${data.listingId}`);
     return this.appService.editListing(data.userId, data.listingId, data.dto);
   }
+
+  @MessagePattern('market.delete-listing.v1')
+  handleDeteteListing(@Payload() data: { userId: string; listingId: string }) {
+    this.logger.log(`Получен запрос на удаление предмета ${data.listingId}`);
+    return this.appService.deleteListing(data.userId, data.listingId);
+  }
 }

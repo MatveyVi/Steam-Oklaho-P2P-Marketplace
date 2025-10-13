@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Inject,
   Logger,
   Param,
@@ -43,6 +44,18 @@ export class MarketController {
       userId,
       listingId,
       dto,
+    });
+  }
+  @Auth()
+  @Delete('listings/:listingId')
+  async deleteListing(
+    @GetCurrentUser() userId: string,
+    @Param('listingId') listingId: string
+  ) {
+    this.logger.log(`Получен запрос на удаление листинга ${listingId}`);
+    return this.marketClient.send('market.delete-listing.v1', {
+      userId,
+      listingId,
     });
   }
 }
