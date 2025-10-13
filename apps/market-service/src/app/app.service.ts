@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { CreateListingDto, EditListingDto } from '@backend/dto';
+import { CreateListingDto, EditListingDto, PaginationDto } from '@backend/dto';
 import { lastValueFrom } from 'rxjs';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
@@ -8,6 +8,7 @@ import {
   RpcForbiddenException,
 } from '@backend/exceptions';
 import { PrismaService } from '@backend/database';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AppService {
@@ -17,6 +18,40 @@ export class AppService {
     private readonly inventoryClient: ClientProxy,
     private readonly prismaService: PrismaService
   ) {}
+
+  async getAllListings(pagination: PaginationDto) {
+    const { page, limit } = pagination;
+    const skip = (page - 1) * limit;
+
+    const orderBy = { createdAt: Prisma.SortOrder.desc };
+
+    const [listings, total] = await Promise.all([
+      this.prismaService.listing.findMany({
+        where: {
+          status: 'ACTIVE',
+        },
+        skip,
+        take: limit,
+        orderBy,
+      }),
+      this.prismaService.listing.count({
+        where: { status: 'ACTIVE' },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: listings,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+  }
+
   async createListing(sellerId: string, dto: CreateListingDto) {
     this.logger.log(`Запрос на выставление на продажу предмета ${dto.itemId}`);
 
@@ -97,7 +132,7 @@ export class AppService {
       );
     }
 
-    return await this.prismaService.listing.delete({
+    await this.prismaService.listing.delete({
       where: {
         id: listingId,
       },

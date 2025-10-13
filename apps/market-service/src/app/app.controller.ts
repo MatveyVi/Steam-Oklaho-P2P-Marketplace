@@ -1,6 +1,6 @@
 import { Controller, Logger } from '@nestjs/common';
 import { AppService } from './app.service';
-import { CreateListingDto, EditListingDto } from '@backend/dto';
+import { CreateListingDto, EditListingDto, PaginationDto } from '@backend/dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
@@ -9,6 +9,14 @@ export class AppController {
     private readonly appService: AppService,
     private readonly logger: Logger
   ) {}
+
+  @MessagePattern('market.get-all-listings.v1')
+  handleGetListings(@Payload() pagination: PaginationDto) {
+    this.logger.log(
+      `Получен запрос на получение листингов, страница: ${pagination.page}, лимит: ${pagination.limit}`
+    );
+    return this.appService.getAllListings(pagination);
+  }
 
   @MessagePattern('market.create-listing.v1')
   handleCreateListing(

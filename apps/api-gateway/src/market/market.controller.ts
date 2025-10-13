@@ -2,15 +2,17 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Inject,
   Logger,
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { Auth } from '../app/decorators/auth.decorator';
 import { GetCurrentUser } from '../app/decorators/get-current-user.decorator';
-import { CreateListingDto, EditListingDto } from '@backend/dto';
+import { CreateListingDto, EditListingDto, PaginationDto } from '@backend/dto';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -21,6 +23,13 @@ export class MarketController {
     private readonly marketClient: ClientProxy,
     private readonly logger: Logger
   ) {}
+
+  @Get('listings')
+  @Auth()
+  async getAllListings(@Query() paginationDto: PaginationDto) {
+    this.logger.log(`Получен запрос на получение всех листингов`);
+    return this.marketClient.send('market.get-all-listings.v1', paginationDto);
+  }
 
   @Auth()
   @Post('listings')
@@ -46,6 +55,7 @@ export class MarketController {
       dto,
     });
   }
+
   @Auth()
   @Delete('listings/:listingId')
   async deleteListing(
