@@ -64,3 +64,22 @@ enum StatusEnum {
   AVAILABLE
   LISTED
 }
+
+model Listing {
+  id       String @id @default(cuid())
+  itemId   String @unique
+  sellerId String
+
+  price  Decimal       @db.Decimal(10, 2)
+  status ListingStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD
+  DELISTED
+  PENDING
+}

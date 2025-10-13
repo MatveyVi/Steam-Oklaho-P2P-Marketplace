@@ -25,7 +25,7 @@ export class InventoryService {
           );
           const baseItem = response.data;
 
-          return { ...instance, ...baseItem };
+          return { ...baseItem, ...instance };
         } catch (error) {
           this.logger.error(
             `Could not fetch details for item ${instance.externalId}`,

@@ -20,4 +20,10 @@ export class AppController {
     this.logger.log(`Получен запрос на инвентарь пользователя ${userId}`);
     return this.appService.getItemsById(userId);
   }
+
+  @MessagePattern('inventory.lock-item.v1')
+  async handleLockItem(@Payload() data: { userId: string; itemId: string }) {
+    await this.appService.lockItem(data);
+    return { success: true };
+  }
 }

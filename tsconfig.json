@@ -38,6 +38,9 @@
     },
     {
       "path": "./apps/inventory-service"
+    },
+    {
+      "path": "./apps/market-service"
     }
   ]
 }

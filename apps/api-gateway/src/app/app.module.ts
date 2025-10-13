@@ -13,6 +13,7 @@ import { HttpModule } from '@nestjs/axios';
 import { CatalogController } from '../catalog/catalog.controller';
 import { InventoryController } from '../inventory/inventory.controller';
 import { InventoryService } from '../inventory/inventory.service';
+import { MarketController } from '../market/market.controller';
 
 @Module({
   imports: [
@@ -55,6 +56,14 @@ import { InventoryService } from '../inventory/inventory.service';
           port: 4004,
         },
       },
+      {
+        name: MICROSERVICE_LIST.MARKET_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 4006,
+        },
+      },
     ]),
   ],
   controllers: [
@@ -63,6 +72,7 @@ import { InventoryService } from '../inventory/inventory.service';
     UserController,
     CatalogController,
     InventoryController,
+    MarketController,
   ],
   providers: [
     AppService,
