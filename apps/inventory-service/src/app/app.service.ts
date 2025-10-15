@@ -21,7 +21,7 @@ export class AppService {
     private readonly catalogClient: ClientProxy
   ) {}
 
-  async addFakeItem(dto: AddFakeItemDto) {
+  async addFakeItem(dto: AddFakeItemDto): Promise<Item> {
     this.logger.log(
       `Добавляем предмет ${dto.externalId} пользователю ${dto.userId}`
     );
@@ -47,7 +47,7 @@ export class AppService {
     });
   }
 
-  async getItemsById(userId: string) {
+  async getItemsById(userId: string): Promise<Item[]> {
     this.logger.log(`Получаем предметы в инветаре пользователя ${userId}`);
     const itemsInstance: Item[] = await this.prismaService.item.findMany({
       where: {
@@ -58,7 +58,7 @@ export class AppService {
     return itemsInstance;
   }
 
-  async lockItem(dto: { userId: string; itemId: string }) {
+  async lockItem(dto: { userId: string; itemId: string }): Promise<void> {
     const item = await this.prismaService.item.findUnique({
       where: {
         id: dto.itemId,
@@ -79,7 +79,7 @@ export class AppService {
     });
   }
 
-  async unlockItem(dto: { userId: string; itemId: string }) {
+  async unlockItem(dto: { userId: string; itemId: string }): Promise<void> {
     const item = await this.prismaService.item.findUnique({
       where: {
         id: dto.itemId,

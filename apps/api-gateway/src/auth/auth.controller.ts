@@ -15,9 +15,14 @@ export class AuthController {
     private readonly logger: Logger
   ) {}
   @Post('register')
-  async register(@Body() dto: RegisterUserDto) {
+  async register(
+    @Body() dto: RegisterUserDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
     this.logger.log(`Запрос на регистрацию от ${dto.email}`);
-    return await this.authClient.send('auth.register.v1', dto);
+    const tokens: { accessToken: string; refreshToken: string } =
+      await lastValueFrom(this.authClient.send('auth.register.v1', dto));
+    return this.setRefreshReturnAccess(res, tokens);
   }
 
   @Post('login')
@@ -26,9 +31,8 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     this.logger.log(`Запрос на логин от ${dto.email}`);
-    const tokens = await lastValueFrom(
-      this.authClient.send('auth.login.v1', dto)
-    );
+    const tokens: { accessToken: string; refreshToken: string } =
+      await lastValueFrom(this.authClient.send('auth.login.v1', dto));
     return this.setRefreshReturnAccess(res, tokens);
   }
 
@@ -39,9 +43,8 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     this.logger.log(`Запрос на refresh от ${userId}`);
-    const tokens = await lastValueFrom(
-      this.authClient.send('auth.refresh.v1', userId)
-    );
+    const tokens: { accessToken: string; refreshToken: string } =
+      await lastValueFrom(this.authClient.send('auth.refresh.v1', userId));
     return this.setRefreshReturnAccess(res, tokens);
   }
 
