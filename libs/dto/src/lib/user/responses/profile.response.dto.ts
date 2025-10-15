@@ -8,6 +8,7 @@ export class ProfileResponseDto {
 }
 export class MyProfileResponseDto {
   userId!: string;
+  email!: string;
   nickname!: string;
   avatarUrl!: string | null;
   bio!: string | null;

@@ -1,4 +1,5 @@
 import { IsNumber, IsString, Max, Min } from 'class-validator';
+import type { Listing } from '@prisma/client';
 
 export class ListingDto {
   @IsString()
@@ -34,4 +35,14 @@ export class EditListingDto {
     message: 'Цена не должна превышать 10000.00',
   })
   price!: number;
+}
+
+export class GetAllListings {
+  data!: Listing[];
+  meta!: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }

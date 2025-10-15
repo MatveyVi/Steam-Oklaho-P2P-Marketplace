@@ -1,5 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { CreateListingDto, EditListingDto, PaginationDto } from '@backend/dto';
+import {
+  CreateListingDto,
+  EditListingDto,
+  GetAllListings,
+  PaginationDto,
+} from '@backend/dto';
 import { lastValueFrom } from 'rxjs';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
@@ -8,7 +13,7 @@ import {
   RpcForbiddenException,
 } from '@backend/exceptions';
 import { PrismaService } from '@backend/database';
-import { Prisma } from '@prisma/client';
+import { Listing, Prisma } from '@prisma/client';
 
 @Injectable()
 export class AppService {
@@ -19,7 +24,7 @@ export class AppService {
     private readonly prismaService: PrismaService
   ) {}
 
-  async getAllListings(pagination: PaginationDto) {
+  async getAllListings(pagination: PaginationDto): Promise<GetAllListings> {
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;
 
@@ -52,7 +57,7 @@ export class AppService {
     };
   }
 
-  async getListingById(listingId: string) {
+  async getListingById(listingId: string): Promise<Listing | null> {
     return this.prismaService.listing.findUnique({
       where: {
         id: listingId,
@@ -60,34 +65,41 @@ export class AppService {
     });
   }
 
-  async createListing(sellerId: string, dto: CreateListingDto) {
+  async createListing(
+    sellerId: string,
+    dto: CreateListingDto
+  ): Promise<Listing> {
     this.logger.log(`Запрос на выставление на продажу предмета ${dto.itemId}`);
 
     try {
-      await lastValueFrom(
+      const externalId = await lastValueFrom(
         this.inventoryClient.send('inventory.lock-item.v1', {
           userId: sellerId,
           itemId: dto.itemId,
         })
       );
-      this.logger.log(`Предмет ${dto.itemId} успешно заблокирован в инвентаре`);
+      return this.prismaService.listing.create({
+        data: {
+          itemId: dto.itemId,
+          externalId,
+          sellerId,
+          price: dto.price,
+          status: 'ACTIVE',
+        },
+      });
     } catch (error: any) {
       this.logger.error(`Не удалось заблокировать предмет: ${error.message}`);
       throw new RpcBadRequestException(
         `Не удалось выставить предмет на продажу: ${error.message}`
       );
     }
-    return this.prismaService.listing.create({
-      data: {
-        itemId: dto.itemId,
-        sellerId,
-        price: dto.price,
-        status: 'ACTIVE',
-      },
-    });
   }
 
-  async editListing(sellerId: string, listingId: string, dto: EditListingDto) {
+  async editListing(
+    sellerId: string,
+    listingId: string,
+    dto: EditListingDto
+  ): Promise<Listing> {
     this.logger.log(`Запрос на изменение предмета ${listingId}}`);
     const listing = await this.prismaService.listing.findUnique({
       where: {
@@ -109,7 +121,7 @@ export class AppService {
     });
   }
 
-  async deleteListing(sellerId: string, listingId: string) {
+  async deleteListing(sellerId: string, listingId: string): Promise<void> {
     this.logger.log(`Запрос на удаление предмета ${listingId}}`);
 
     const listing = await this.prismaService.listing.findUnique({

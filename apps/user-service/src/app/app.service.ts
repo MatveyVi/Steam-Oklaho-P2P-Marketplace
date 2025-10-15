@@ -7,12 +7,13 @@ import {
   UserRegisteredEvent,
 } from '@backend/dto';
 import {} from '@backend/dto';
+import { Profile } from '@prisma/client';
 
 @Injectable()
 export class AppService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createProfile(data: UserRegisteredEvent) {
+  async createProfile(data: UserRegisteredEvent): Promise<Profile> {
     const { userId, email } = data;
     const defaultNickName = email.split('@')[0];
 
@@ -32,6 +33,7 @@ export class AppService {
       },
       select: {
         userId: true,
+        email: true,
         nickname: true,
         avatarUrl: true,
         bio: true,
