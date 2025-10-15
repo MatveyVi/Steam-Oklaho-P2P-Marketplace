@@ -7,7 +7,7 @@ import {
   UserRegisteredEvent,
 } from '@backend/dto';
 import {} from '@backend/dto';
-import { Profile } from '@prisma/client';
+import { Profile, User } from '@prisma/client';
 
 @Injectable()
 export class AppService {
@@ -44,6 +44,12 @@ export class AppService {
     });
     if (!user) throw new RpcBadRequestException('Профиль не существует');
     return user;
+  }
+
+  async findProfilesByIds(userIds: string[]): Promise<Profile[]> {
+    return this.prismaService.profile.findMany({
+      where: { userId: { in: userIds } },
+    });
   }
 
   async findProfileByNickname(nickname: string): Promise<ProfileResponseDto> {

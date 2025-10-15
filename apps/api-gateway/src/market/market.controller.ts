@@ -30,7 +30,7 @@ export class MarketController {
   @Auth()
   async getAllListings(@Query() paginationDto: PaginationDto) {
     this.logger.log(`Получен запрос на получение всех листингов`);
-    return this.marketClient.send('market.get-all-listings.v1', paginationDto);
+    return this.marketService.getAllListings(paginationDto);
   }
 
   @Get('listings/:listingId')

@@ -6,11 +6,19 @@ import { BaseItem } from '@prisma/client';
 export class AppService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll(): Promise<BaseItem[]> {
+  async findAll(): Promise<BaseItem[]> {
     return this.prismaService.baseItem.findMany();
   }
 
-  findByExternalId(externalId: string): Promise<BaseItem | null> {
+  async findManyByIds(ids: string[]): Promise<BaseItem[]> {
+    return this.prismaService.baseItem.findMany({
+      where: {
+        externalId: { in: ids },
+      },
+    });
+  }
+
+  async findByExternalId(externalId: string): Promise<BaseItem | null> {
     return this.prismaService.baseItem.findUnique({
       where: {
         externalId,

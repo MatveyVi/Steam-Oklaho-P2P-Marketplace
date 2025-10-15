@@ -22,3 +22,12 @@ export class ListingResponseDto {
   @Expose()
   imageUrl!: string;
 }
+export class ListingsResponseDto {
+  data!: ListingResponseDto[];
+  meta!: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}

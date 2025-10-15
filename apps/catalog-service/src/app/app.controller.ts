@@ -1,4 +1,10 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
@@ -9,6 +15,12 @@ export class AppController {
   @Get()
   async findAll() {
     return this.appService.findAll();
+  }
+
+  @Get('by-ids')
+  async findManyByIds(@Query('ids') ids: string[]) {
+    const idArray = Array.isArray(ids) ? ids : [ids];
+    return this.appService.findManyByIds(idArray);
   }
 
   @Get(':externalId')
