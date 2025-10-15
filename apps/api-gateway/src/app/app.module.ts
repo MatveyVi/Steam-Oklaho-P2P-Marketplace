@@ -14,6 +14,7 @@ import { CatalogController } from '../catalog/catalog.controller';
 import { InventoryController } from '../inventory/inventory.controller';
 import { InventoryService } from '../inventory/inventory.service';
 import { MarketController } from '../market/market.controller';
+import { MarketService } from '../market/market.service';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { MarketController } from '../market/market.controller';
   providers: [
     AppService,
     InventoryService,
+    MarketService,
     JwtStrategy,
     JwtRefreshStrategy,
     Logger,

@@ -72,27 +72,27 @@ export class AppService {
     this.logger.log(`Запрос на выставление на продажу предмета ${dto.itemId}`);
 
     try {
-      await lastValueFrom(
+      const externalId = await lastValueFrom(
         this.inventoryClient.send('inventory.lock-item.v1', {
           userId: sellerId,
           itemId: dto.itemId,
         })
       );
-      this.logger.log(`Предмет ${dto.itemId} успешно заблокирован в инвентаре`);
+      return this.prismaService.listing.create({
+        data: {
+          itemId: dto.itemId,
+          externalId,
+          sellerId,
+          price: dto.price,
+          status: 'ACTIVE',
+        },
+      });
     } catch (error: any) {
       this.logger.error(`Не удалось заблокировать предмет: ${error.message}`);
       throw new RpcBadRequestException(
         `Не удалось выставить предмет на продажу: ${error.message}`
       );
     }
-    return this.prismaService.listing.create({
-      data: {
-        itemId: dto.itemId,
-        sellerId,
-        price: dto.price,
-        status: 'ACTIVE',
-      },
-    });
   }
 
   async editListing(

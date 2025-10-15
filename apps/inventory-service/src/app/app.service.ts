@@ -58,7 +58,7 @@ export class AppService {
     return itemsInstance;
   }
 
-  async lockItem(dto: { userId: string; itemId: string }): Promise<void> {
+  async lockItem(dto: { userId: string; itemId: string }): Promise<string> {
     const item = await this.prismaService.item.findUnique({
       where: {
         id: dto.itemId,
@@ -77,6 +77,7 @@ export class AppService {
         status: 'LISTED',
       },
     });
+    return item.externalId;
   }
 
   async unlockItem(dto: { userId: string; itemId: string }): Promise<void> {

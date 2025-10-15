@@ -66,9 +66,10 @@ enum StatusEnum {
 }
 
 model Listing {
-  id       String @id @default(cuid())
-  itemId   String @unique
-  sellerId String
+  id         String @id @default(cuid())
+  itemId     String @unique
+  sellerId   String
+  externalId String
 
   price  Decimal       @db.Decimal(10, 2)
   status ListingStatus @default(ACTIVE)
