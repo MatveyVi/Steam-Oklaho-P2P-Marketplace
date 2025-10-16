@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { BaseItem, Listing, Profile, User } from '@prisma/client';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, map } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import {
   GetAllListings,
@@ -61,7 +61,7 @@ export class MarketService {
     const sellerIds = [...new Set(listings.map((l) => l.sellerId))];
     const baseItemsIds = [...new Set(listings.map((l) => l.externalId))];
 
-    const [sellers, { data: items }] = await Promise.all([
+    const [sellers, items] = await Promise.all([
       lastValueFrom(
         this.userClient.send<Profile[]>(
           'user.get-profiles-by-ids.v1',
@@ -69,9 +69,11 @@ export class MarketService {
         )
       ),
       lastValueFrom(
-        this.httpService.get<BaseItem[]>(`/items/by-ids`, {
-          params: { ids: baseItemsIds.join(',') },
-        })
+        this.httpService
+          .get<BaseItem[]>(`/items/by-ids`, {
+            params: { ids: baseItemsIds.join(',') },
+          })
+          .pipe(map((res) => res.data))
       ),
     ]);
     const data: ListingResponseDto[] = listings.map((listing) => {

@@ -18,8 +18,9 @@ export class AppController {
   }
 
   @Get('by-ids')
-  async findManyByIds(@Query('ids') ids: string[]) {
-    const idArray = Array.isArray(ids) ? ids : [ids];
+  async findManyByIds(@Query('ids') ids: string) {
+    const idsSplitted = ids.split(',');
+    const idArray = Array.isArray(idsSplitted) ? idsSplitted : [idsSplitted];
     return this.appService.findManyByIds(idArray);
   }
 
