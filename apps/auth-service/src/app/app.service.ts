@@ -22,7 +22,6 @@ export class AppService {
     @Inject(MICROSERVICE_LIST.KAFKA_SERVICE)
     private readonly kafkaClient: ClientProxy
   ) {}
-
   async register(dto: RegisterUserDto) {
     const { name, email, password } = dto;
     const existingUser = await this.prisma.user.findUnique({

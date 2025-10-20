@@ -7,7 +7,7 @@ import {
   UserRegisteredEvent,
 } from '@backend/dto';
 import {} from '@backend/dto';
-import { Profile, User } from '@prisma/client';
+import { Profile } from '@prisma/client';
 
 @Injectable()
 export class AppService {
