@@ -99,6 +99,9 @@ export class MarketService {
     userId: string,
     paginationDto: PaginationDto
   ): Promise<ListingsResponseDto> {
+    const user = await lastValueFrom(
+      this.userClient.send('user.get-profile-by-id.v1', userId)
+    );
     const listingsResponse: GetAllListings = await lastValueFrom(
       this.marketClient.send('market.get-user-listings.v1', {
         userId,
