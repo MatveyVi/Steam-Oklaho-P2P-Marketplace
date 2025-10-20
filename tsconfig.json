@@ -43,9 +43,6 @@
       "path": "./apps/market-service"
     },
     {
-      "path": "./apps/payment-service-e2e"
-    },
-    {
       "path": "./apps/payment-service"
     }
   ]

@@ -31,4 +31,15 @@ export class AppController {
     await this.appService.unlockItem(data);
     return { success: true };
   }
+
+  @MessagePattern('inventory.transfer-item.v1')
+  async handleTransferItem(
+    @Payload() data: { itemId: string; currentOwner: string; newOwner: string }
+  ) {
+    return this.appService.transferItem(
+      data.itemId,
+      data.currentOwner,
+      data.newOwner
+    );
+  }
 }

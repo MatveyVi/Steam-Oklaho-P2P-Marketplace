@@ -17,6 +17,14 @@ import { DatabaseModule } from '@backend/database';
           port: 4004,
         },
       },
+      {
+        name: MICROSERVICE_LIST.PAYMENT_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 4007,
+        },
+      },
     ]),
   ],
   controllers: [AppController],
