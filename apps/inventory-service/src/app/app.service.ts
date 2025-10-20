@@ -112,7 +112,7 @@ export class AppService {
       throw new RpcConflictException('Вы не можете передать предмет себе');
     return this.prismaService.item.update({
       where: { id: itemId },
-      data: { ownerId: newOwner },
+      data: { ownerId: newOwner, status: 'AVAILABLE' },
     });
   }
 }
