@@ -60,6 +60,38 @@ export class AppService {
     };
   }
 
+  async getUserListings(userId: string, pagination: PaginationDto) {
+    const { page, limit } = pagination;
+    const skip = (page - 1) * limit;
+
+    const orderBy = { createdAt: Prisma.SortOrder.desc };
+    const [listings, total] = await Promise.all([
+      this.prismaService.listing.findMany({
+        where: {
+          status: 'ACTIVE',
+          sellerId: userId,
+        },
+        skip,
+        take: limit,
+        orderBy,
+      }),
+      this.prismaService.listing.count({
+        where: { status: 'ACTIVE' },
+      }),
+    ]);
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: listings,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+  }
+
   async getListingById(listingId: string): Promise<Listing | null> {
     return this.prismaService.listing.findUnique({
       where: {

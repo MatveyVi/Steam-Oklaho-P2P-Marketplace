@@ -10,6 +10,16 @@ export class AppController {
     private readonly logger: Logger
   ) {}
 
+  @MessagePattern('market.get-user-listings.v1')
+  handleGetMyListings(
+    @Payload() data: { userId: string; paginationDto: PaginationDto }
+  ) {
+    this.logger.log(
+      `Запрос на получение предметов пользователя ${data.userId}`
+    );
+    return this.appService.getUserListings(data.userId, data.paginationDto);
+  }
+
   @MessagePattern('market.get-all-listings.v1')
   handleGetListings(@Payload() pagination: PaginationDto) {
     this.logger.log(

@@ -26,11 +26,21 @@ export class MarketController {
     private readonly marketService: MarketService
   ) {}
 
-  @Get('listings')
   @Auth()
+  @Get('listings')
   async getAllListings(@Query() paginationDto: PaginationDto) {
     this.logger.log(`Получен запрос на получение всех листингов`);
     return this.marketService.getAllListings(paginationDto);
+  }
+
+  @Auth()
+  @Get('listings/me')
+  async getMyListings(
+    @GetCurrentUser() userId: string,
+    @Query() paginationDto: PaginationDto
+  ) {
+    this.logger.log(`Запрос на получение своих листингов`);
+    return this.marketService.getUserListings(userId, paginationDto);
   }
 
   @Get('listings/:listingId')

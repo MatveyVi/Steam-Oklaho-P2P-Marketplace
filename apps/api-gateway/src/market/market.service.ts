@@ -94,4 +94,54 @@ export class MarketService {
       meta,
     };
   }
+
+  async getUserListings(
+    userId: string,
+    paginationDto: PaginationDto
+  ): Promise<ListingsResponseDto> {
+    const listingsResponse: GetAllListings = await lastValueFrom(
+      this.marketClient.send('market.get-user-listings.v1', {
+        userId,
+        paginationDto,
+      })
+    );
+    const listings = listingsResponse.data;
+    const meta = listingsResponse.meta;
+
+    const sellerIds = [...new Set(listings.map((l) => l.sellerId))];
+    const baseItemsIds = [...new Set(listings.map((l) => l.externalId))];
+
+    const [sellers, items] = await Promise.all([
+      lastValueFrom(
+        this.userClient.send<Profile[]>(
+          'user.get-profiles-by-ids.v1',
+          sellerIds
+        )
+      ),
+      lastValueFrom(
+        this.httpService
+          .get<BaseItem[]>(`/items/by-ids`, {
+            params: { ids: baseItemsIds.join(',') },
+          })
+          .pipe(map((res) => res.data))
+      ),
+    ]);
+    const data: ListingResponseDto[] = listings.map((listing) => {
+      const seller = sellers.find((s) => s.userId === listing.sellerId);
+      const item = items.find((i) => i.externalId === listing.externalId);
+      return plainToInstance(
+        ListingResponseDto,
+        {
+          ...seller,
+          ...item,
+          ...listing,
+        },
+        { excludeExtraneousValues: true }
+      );
+    });
+    return {
+      data,
+      meta,
+    };
+  }
 }
