@@ -34,9 +34,19 @@ export class MarketController {
   }
 
   @Auth()
-  @Get('listings/me')
+  @Get('listings/stall/me')
   async getMyListings(
     @GetCurrentUser() userId: string,
+    @Query() paginationDto: PaginationDto
+  ) {
+    this.logger.log(`Запрос на получение своих листингов`);
+    return this.marketService.getUserListings(userId, paginationDto);
+  }
+
+  @Auth()
+  @Get('listings/stall/:userId')
+  async getUserListings(
+    @Param('userId') userId: string,
     @Query() paginationDto: PaginationDto
   ) {
     this.logger.log(`Запрос на получение своих листингов`);

@@ -76,7 +76,7 @@ export class AppService {
         orderBy,
       }),
       this.prismaService.listing.count({
-        where: { status: 'ACTIVE' },
+        where: { status: 'ACTIVE', sellerId: userId },
       }),
     ]);
     const totalPages = Math.ceil(total / limit);
