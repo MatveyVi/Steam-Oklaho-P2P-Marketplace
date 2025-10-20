@@ -31,4 +31,9 @@ export class AppController {
   handleCredit(@Payload() data: { userId: string; amount: Decimal }) {
     return this.appService.credit(data.userId, data.amount);
   }
+
+  @MessagePattern('payment.get-balance.v1')
+  handleGetBalance(@Payload() userId: string) {
+    return this.appService.getBalance(userId);
+  }
 }

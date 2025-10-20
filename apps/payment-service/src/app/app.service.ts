@@ -55,4 +55,12 @@ export class AppService {
       data: { amount: { increment: amount } },
     });
   }
+
+  async getBalance(userId: string) {
+    this.logger.log(`Запрос на получение баланса ${userId}`);
+    return this.prismaService.balance.findUnique({
+      where: { userId },
+      select: { amount: true },
+    });
+  }
 }

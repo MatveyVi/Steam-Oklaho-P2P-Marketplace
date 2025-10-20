@@ -1,7 +1,8 @@
-import { Body, Controller, Inject, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Logger, Post } from '@nestjs/common';
 import { Auth } from '../app/decorators/auth.decorator';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
+import { GetCurrentUser } from '../app/decorators/get-current-user.decorator';
 
 @Controller('payment')
 export class PaymentController {
@@ -20,5 +21,11 @@ export class PaymentController {
       userId: dto.userId,
       amount: dto.amount,
     });
+  }
+
+  @Auth()
+  @Get('balance')
+  async getBalance(@GetCurrentUser() userId: string) {
+    return this.paymentClient.send('payment.get-balance.v1', userId);
   }
 }
