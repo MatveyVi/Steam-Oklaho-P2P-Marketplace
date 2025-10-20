@@ -84,3 +84,10 @@ enum ListingStatus {
   DELISTED
   PENDING
 }
+
+model Balance {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  amount    Decimal  @default(0) @db.Decimal(10, 2)
+  updatedAt DateTime @updatedAt
+}

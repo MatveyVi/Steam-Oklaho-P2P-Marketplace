@@ -10,19 +10,12 @@ import { DatabaseModule } from '@backend/database';
     DatabaseModule,
     ClientsModule.register([
       {
-        name: MICROSERVICE_LIST.INVENTORY_SERVICE,
-        transport: Transport.TCP,
+        name: MICROSERVICE_LIST.KAFKA_SERVICE,
+        transport: Transport.KAFKA,
         options: {
-          host: 'localhost',
-          port: 4004,
-        },
-      },
-      {
-        name: MICROSERVICE_LIST.PAYMENT_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4007,
+          client: {
+            brokers: ['localhost:29092'],
+          },
         },
       },
     ]),

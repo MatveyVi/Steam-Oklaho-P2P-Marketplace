@@ -45,4 +45,9 @@ export class AppController {
     this.logger.log(`Получен запрос на удаление предмета ${data.listingId}`);
     return this.appService.deleteListing(data.userId, data.listingId);
   }
+
+  @MessagePattern('market.buy-listing.v1')
+  handleBuyItem(@Payload() data: { buyerId: string; listingId: string }) {
+    return this.appService.buyItem(data.buyerId, data.listingId);
+  }
 }

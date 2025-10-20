@@ -41,6 +41,9 @@
     },
     {
       "path": "./apps/market-service"
+    },
+    {
+      "path": "./apps/payment-service"
     }
   ]
 }

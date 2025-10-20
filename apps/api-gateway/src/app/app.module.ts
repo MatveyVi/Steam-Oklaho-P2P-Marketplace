@@ -15,6 +15,7 @@ import { InventoryController } from '../inventory/inventory.controller';
 import { InventoryService } from '../inventory/inventory.service';
 import { MarketController } from '../market/market.controller';
 import { MarketService } from '../market/market.service';
+import { PaymentController } from '../payment/payment.controller';
 
 @Module({
   imports: [
@@ -65,6 +66,14 @@ import { MarketService } from '../market/market.service';
           port: 4006,
         },
       },
+      {
+        name: MICROSERVICE_LIST.PAYMENT_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 4007,
+        },
+      },
     ]),
   ],
   controllers: [
@@ -74,6 +83,7 @@ import { MarketService } from '../market/market.service';
     CatalogController,
     InventoryController,
     MarketController,
+    PaymentController,
   ],
   providers: [
     AppService,

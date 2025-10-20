@@ -100,4 +100,19 @@ export class AppService {
       },
     });
   }
+
+  async transferItem(itemId: string, currentOwner: string, newOwner: string) {
+    const item = await this.prismaService.item.findUnique({
+      where: { id: itemId },
+    });
+    if (!item) throw new RpcBadRequestException('Предмет не существует');
+    if (item.ownerId !== currentOwner)
+      throw new RpcConflictException('Предмет вам не принадлежит');
+    if (item.ownerId === newOwner)
+      throw new RpcConflictException('Вы не можете передать предмет себе');
+    return this.prismaService.item.update({
+      where: { id: itemId },
+      data: { ownerId: newOwner },
+    });
+  }
 }

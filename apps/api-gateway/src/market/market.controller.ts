@@ -77,4 +77,21 @@ export class MarketController {
       listingId,
     });
   }
+
+  // ---- ПОКУПКА АЙТЕМА ----
+
+  @Auth()
+  @Post('listings/:listingId/buy')
+  async buyItem(
+    @GetCurrentUser() buyerId: string,
+    @Param('listingId') listingId: string
+  ) {
+    this.logger.log(
+      `Получен запрос на покупку листинга ${listingId} от ${buyerId}`
+    );
+    return this.marketClient.send('market.buy-listing.v1', {
+      buyerId,
+      listingId,
+    });
+  }
 }
