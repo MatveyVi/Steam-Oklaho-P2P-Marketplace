@@ -21,6 +21,12 @@ export class AppController {
     return this.appService.findProfileById(userId);
   }
 
+  @MessagePattern('user.get-profiles-by-ids.v1')
+  async handleGetProfilesByIds(@Payload() userIds: string[]) {
+    this.logger.log(`Получена запрос на множество профилей`);
+    return this.appService.findProfilesByIds(userIds);
+  }
+
   @MessagePattern('user.get-profile-by-nickname.v1')
   async handleGetProfileByNickname(@Payload() nickname: string) {
     this.logger.log(`Получена запрос на профиль пользователя: ${nickname}`);

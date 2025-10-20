@@ -5,3 +5,4 @@ export * from './lib/user/responses/profile.response.dto';
 export * from './lib/inventory/inventory.dto';
 export * from './lib/market/listings.dto';
 export * from './lib/shared/pagination.dto';
+export * from './lib/market/responses.dto';

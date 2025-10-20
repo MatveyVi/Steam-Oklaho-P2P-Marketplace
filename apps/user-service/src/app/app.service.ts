@@ -46,6 +46,12 @@ export class AppService {
     return user;
   }
 
+  async findProfilesByIds(userIds: string[]): Promise<Profile[]> {
+    return this.prismaService.profile.findMany({
+      where: { userId: { in: userIds } },
+    });
+  }
+
   async findProfileByNickname(nickname: string): Promise<ProfileResponseDto> {
     const user = await this.prismaService.profile.findUnique({
       where: {
