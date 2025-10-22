@@ -4,9 +4,15 @@ import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { DatabaseModule } from '@backend/database';
+import { ConfigModule } from '@nestjs/config';
+import { WebhookController } from '../webhook/webhook.controller';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ConfigModule,
     DatabaseModule,
     ClientsModule.register([
       {
@@ -20,7 +26,7 @@ import { DatabaseModule } from '@backend/database';
       },
     ]),
   ],
-  controllers: [AppController],
+  controllers: [AppController, WebhookController],
   providers: [AppService, Logger],
 })
 export class AppModule {}

@@ -36,4 +36,9 @@ export class AppController {
   handleGetBalance(@Payload() userId: string) {
     return this.appService.getBalance(userId);
   }
+
+  @MessagePattern('payment.initiate-deposit.v1')
+  handleStripeDeposit(@Payload() data: { userId: string; amount: number }) {
+    return this.appService.stripeDeposit(data.userId, data.amount);
+  }
 }
