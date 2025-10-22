@@ -28,4 +28,19 @@ export class PaymentController {
   async getBalance(@GetCurrentUser() userId: string) {
     return this.paymentClient.send('payment.get-balance.v1', userId);
   }
+
+  @Auth()
+  @Post('deposit')
+  async stripeDeposit(
+    @GetCurrentUser() userId: string,
+    @Body() dto: { amount: number }
+  ) {
+    this.logger.log(
+      `Запрос на пополнение баланса на ${dto.amount} от ${userId} через Stripe`
+    );
+    return this.paymentClient.send('payment.initiate-deposit.v1', {
+      userId,
+      amount: dto.amount,
+    });
+  }
 }

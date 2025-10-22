@@ -91,3 +91,20 @@ model Balance {
   amount    Decimal  @default(0) @db.Decimal(10, 2)
   updatedAt DateTime @updatedAt
 }
+
+model Transaction {
+  id              String            @id @default(cuid())
+  userId          String
+  amount          Decimal           @db.Decimal(10, 2)
+  status          TransactionStatus
+  paymentIntentId String            @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TransactionStatus {
+  PENDING
+  FAILED
+  COMPLETED
+}
