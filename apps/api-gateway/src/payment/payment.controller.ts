@@ -43,4 +43,17 @@ export class PaymentController {
       amount: dto.amount,
     });
   }
+
+  @Auth()
+  @Post('withdraw')
+  async withdrawal(
+    @GetCurrentUser() userId: string,
+    @Body() dto: { amount: number }
+  ) {
+    this.logger.log(`Запрос на вывод средств от ${userId} на ${dto.amount}`);
+    return this.paymentClient.send('payment.initiate-withdrawal.v1', {
+      userId,
+      amount: dto.amount,
+    });
+  }
 }

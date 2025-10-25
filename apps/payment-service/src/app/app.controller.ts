@@ -41,4 +41,9 @@ export class AppController {
   handleStripeDeposit(@Payload() data: { userId: string; amount: number }) {
     return this.appService.stripeDeposit(data.userId, data.amount);
   }
+
+  @MessagePattern('payment.initiate-withdrawal.v1')
+  handleWithdrawal(@Payload() data: { userId: string; amount: Decimal }) {
+    return this.appService.debit(data.userId, data.amount);
+  }
 }
