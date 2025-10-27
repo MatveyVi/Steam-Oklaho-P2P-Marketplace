@@ -44,6 +44,9 @@
     },
     {
       "path": "./apps/payment-service"
+    },
+    {
+      "path": "./apps/notification-service"
     }
   ]
 }

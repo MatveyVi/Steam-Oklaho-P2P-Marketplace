@@ -23,7 +23,7 @@ export class AppController {
   }
 
   @MessagePattern('payment.debit.v1')
-  handleDebit(@Payload() data: { userId: string; amount: Decimal }) {
+  handleDebit(@Payload() data: { userId: string; amount: number }) {
     return this.appService.debit(data.userId, data.amount);
   }
 
@@ -43,7 +43,7 @@ export class AppController {
   }
 
   @MessagePattern('payment.initiate-withdrawal.v1')
-  handleWithdrawal(@Payload() data: { userId: string; amount: Decimal }) {
-    return this.appService.debit(data.userId, data.amount);
+  handleWithdrawal(@Payload() data: { userId: string; amount: number }) {
+    return this.appService.stripeWithdrawal(data.userId, data.amount);
   }
 }

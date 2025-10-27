@@ -1,20 +1,27 @@
 import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { HttpModule } from '@nestjs/axios';
 import { MICROSERVICE_LIST } from '@backend/constants';
-import { DatabaseModule } from '@backend/database';
+import { ResendMailer } from './resend/resend.service';
 
 @Module({
   imports: [
-    DatabaseModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    HttpModule.register({
+      baseURL: 'http://localhost:3003/api',
+    }),
     ClientsModule.register([
       {
-        name: MICROSERVICE_LIST.INVENTORY_SERVICE,
+        name: MICROSERVICE_LIST.USER_SERVICE,
         transport: Transport.TCP,
         options: {
           host: 'localhost',
-          port: 4004,
+          port: 4005,
         },
       },
       {
@@ -26,20 +33,16 @@ import { DatabaseModule } from '@backend/database';
         },
       },
       {
-        name: MICROSERVICE_LIST.KAFKA_SERVICE,
-        transport: Transport.KAFKA,
+        name: MICROSERVICE_LIST.CATALOG_SERVICE,
+        transport: Transport.TCP,
         options: {
-          client: {
-            brokers: ['localhost:29092'],
-          },
-          consumer: {
-            groupId: 'market-service',
-          },
+          host: 'localhost',
+          port: 4003,
         },
       },
     ]),
   ],
   controllers: [AppController],
-  providers: [AppService, Logger],
+  providers: [AppService, ResendMailer, Logger],
 })
 export class AppModule {}

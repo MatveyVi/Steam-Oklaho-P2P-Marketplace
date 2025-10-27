@@ -1,6 +1,4 @@
 import { Logger, Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { AuthController } from '../auth/auth.controller';
@@ -77,7 +75,6 @@ import { PaymentController } from '../payment/payment.controller';
     ]),
   ],
   controllers: [
-    AppController,
     AuthController,
     UserController,
     CatalogController,
@@ -86,7 +83,6 @@ import { PaymentController } from '../payment/payment.controller';
     PaymentController,
   ],
   providers: [
-    AppService,
     InventoryService,
     MarketService,
     JwtStrategy,

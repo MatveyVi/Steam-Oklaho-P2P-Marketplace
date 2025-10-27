@@ -6,3 +6,7 @@ export * from './lib/inventory/inventory.dto';
 export * from './lib/market/listings.dto';
 export * from './lib/shared/pagination.dto';
 export * from './lib/market/responses.dto';
+export * from './lib/notifications/notifications.dto';
+export * from './lib/profile/profile-created.dto';
+export * from './lib/payment/payment.dto';
+export * from './lib/market/item-transfer.dto';
