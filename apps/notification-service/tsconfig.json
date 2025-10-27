@@ -4,13 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/constants"
-    },
-    {
       "path": "../../libs/exceptions"
     },
     {
-      "path": "../../libs/database"
+      "path": "../../libs/constants"
     },
     {
       "path": "../../libs/dto"

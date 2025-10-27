@@ -3,6 +3,8 @@ import {
   CreateListingDto,
   EditListingDto,
   GetAllListings,
+  ItemTransfer,
+  ItemTransferError,
   PaginationDto,
 } from '@backend/dto';
 import { lastValueFrom } from 'rxjs';
@@ -24,6 +26,8 @@ export class AppService {
     private readonly inventoryClient: ClientProxy,
     @Inject(MICROSERVICE_LIST.PAYMENT_SERVICE)
     private readonly paymentClient: ClientProxy,
+    @Inject(MICROSERVICE_LIST.KAFKA_SERVICE)
+    private readonly kafkaClient: ClientProxy,
     private readonly prismaService: PrismaService
   ) {}
 
@@ -212,7 +216,7 @@ export class AppService {
       await lastValueFrom(
         this.paymentClient.send('payment.debit.v1', {
           userId: buyerId,
-          amount: listing.price,
+          amount: listing.price.toNumber(),
         })
       );
       this.logger.log(`1/3 Средства успешно списаны с ${buyerId}`);
@@ -247,6 +251,13 @@ export class AppService {
       this.logger.log(
         `Компенсация средств произошла успешно пользователю ${buyerId}`
       );
+      const event = new ItemTransferError(
+        listing.sellerId,
+        buyerId,
+        listing,
+        error.message
+      );
+      this.kafkaClient.emit('market.item-transfer-fail.v1', event);
       throw new RpcConflictException(`Не удалось предмет, ${error.message}`);
     }
 
@@ -264,11 +275,15 @@ export class AppService {
       this.logger.log(
         `3/3 Провал. Ошибка зачисления на баланс продавца, необходимо ручное вмешательство`
       );
+      const event = new ItemTransfer(listing.sellerId, buyerId, listing);
+      this.kafkaClient.emit('market.payout-fail.v1', event);
     }
     await this.prismaService.listing.update({
       where: { id: listingId },
       data: { status: 'SOLD' },
     });
+    const event = new ItemTransfer(listing.sellerId, buyerId, listing);
+    this.kafkaClient.emit('market.item-sold.v1', event);
     return {
       success: true,
       message: 'Покупка прошла успешно, средства списаны, предмет передан вам.',

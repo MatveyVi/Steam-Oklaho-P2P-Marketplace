@@ -1,15 +1,20 @@
 import { PrismaService } from '@backend/database';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
 import { RpcBadRequestException } from '@backend/exceptions';
 import { Stripe } from 'stripe';
 import { ConfigService } from '@nestjs/config';
+import { MICROSERVICE_LIST } from '@backend/constants';
+import { ClientProxy } from '@nestjs/microservices';
+import { Balance, PaymentWithdrawal } from '@backend/dto';
 
 @Injectable()
 export class AppService {
   private readonly stripe: Stripe;
   constructor(
     private readonly prismaService: PrismaService,
+    @Inject(MICROSERVICE_LIST.KAFKA_SERVICE)
+    private readonly kafkaClient: ClientProxy,
     private readonly logger: Logger,
     configService: ConfigService
   ) {
@@ -39,7 +44,7 @@ export class AppService {
     });
   }
 
-  async debit(userId: string, amount: Decimal) {
+  async debit(userId: string, amount: number) {
     this.logger.log(`Списание ${amount} с ${userId}`);
 
     return this.prismaService.$transaction(async (prisma) => {
@@ -48,6 +53,9 @@ export class AppService {
       });
       if (balance.amount.lessThan(amount)) {
         throw new RpcBadRequestException('Недостаточно средств');
+      }
+      if (balance.amount.lessThan(20)) {
+        throw new RpcBadRequestException('Выводы менее 20$ недоступны');
       }
       return prisma.balance.update({
         where: { userId },
@@ -92,8 +100,16 @@ export class AppService {
         status: 'PENDING',
       },
     });
-
+    const event = new PaymentWithdrawal(userId, 'deposit', amount);
+    this.kafkaClient.emit('payment.balance-update.v1', event);
     return { status: paymentIntent.status };
+  }
+
+  async stripeWithdrawal(userId: string, amount: number) {
+    const response = await this.debit(userId, amount);
+    const event = new PaymentWithdrawal(userId, 'withdraw', amount);
+    this.kafkaClient.emit('payment.balance-update.v1', event);
+    return response;
   }
 
   async handleSuccessfulPayment(paymentIntentId: string) {
