@@ -72,6 +72,14 @@ import { PaymentController } from '../payment/payment.controller';
           port: 4007,
         },
       },
+      {
+        name: MICROSERVICE_LIST.SEARCH_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 4009,
+        },
+      },
     ]),
   ],
   controllers: [

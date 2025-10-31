@@ -12,7 +12,13 @@ import {
 } from '@nestjs/common';
 import { Auth } from '../app/decorators/auth.decorator';
 import { GetCurrentUser } from '../app/decorators/get-current-user.decorator';
-import { CreateListingDto, EditListingDto, PaginationDto } from '@backend/dto';
+import {
+  CreateListingDto,
+  EditListingDto,
+  GetListingsQueryDto,
+  PaginationDto,
+  SearchListingParams,
+} from '@backend/dto';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { MarketService } from './market.service';
@@ -22,13 +28,25 @@ export class MarketController {
   constructor(
     @Inject(MICROSERVICE_LIST.MARKET_SERVICE)
     private readonly marketClient: ClientProxy,
+    @Inject(MICROSERVICE_LIST.SEARCH_SERVICE)
+    private readonly searchClient: ClientProxy,
     private readonly logger: Logger,
     private readonly marketService: MarketService
   ) {}
 
   @Auth()
   @Get('listings')
-  async getAllListings(@Query() paginationDto: PaginationDto) {
+  async getAllListings(@Query() queryDto: GetListingsQueryDto) {
+    const { search, ...paginationDto } = queryDto;
+    if (search) {
+      this.logger.log(`Получен запрос на получение листингов по query`);
+      const data = new SearchListingParams(
+        search,
+        paginationDto.page,
+        paginationDto.limit
+      );
+      return this.searchClient.send('search.listings.v1', data);
+    }
     this.logger.log(`Получен запрос на получение всех листингов`);
     return this.marketService.getAllListings(paginationDto);
   }
