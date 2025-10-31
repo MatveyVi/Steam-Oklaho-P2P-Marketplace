@@ -3,9 +3,11 @@ import {
   CreateListingDto,
   EditListingDto,
   GetAllListings,
+  IndexListingsDto,
   ItemTransfer,
   ItemTransferError,
   PaginationDto,
+  Status,
 } from '@backend/dto';
 import { lastValueFrom } from 'rxjs';
 import { MICROSERVICE_LIST } from '@backend/constants';
@@ -117,7 +119,7 @@ export class AppService {
           itemId: dto.itemId,
         })
       );
-      return this.prismaService.listing.create({
+      const listing = await this.prismaService.listing.create({
         data: {
           itemId: dto.itemId,
           externalId,
@@ -126,6 +128,18 @@ export class AppService {
           status: 'ACTIVE',
         },
       });
+      const event = new IndexListingsDto(
+        listing.id,
+        listing.itemId,
+        sellerId,
+        String(listing.price),
+        Status.ACTIVE,
+        listing.createdAt,
+        listing.updatedAt,
+        externalId
+      );
+      this.kafkaClient.emit('listing.created.v1', event);
+      return listing;
     } catch (error: any) {
       this.logger.error(`Не удалось заблокировать предмет: ${error.message}`);
       throw new RpcBadRequestException(
@@ -150,7 +164,7 @@ export class AppService {
     if (listing.sellerId !== sellerId)
       throw new RpcForbiddenException('Вы не владеете этим предметом');
 
-    return await this.prismaService.listing.update({
+    const listingUpdated = await this.prismaService.listing.update({
       where: {
         id: listingId,
       },
@@ -158,9 +172,21 @@ export class AppService {
         price: dto.price,
       },
     });
+    const event = new IndexListingsDto(
+      listing.id,
+      listing.itemId,
+      sellerId,
+      String(listing.price),
+      Status.ACTIVE,
+      listing.createdAt,
+      listing.updatedAt,
+      listing.externalId
+    );
+    this.kafkaClient.emit('listing.updated.v1', event);
+    return listingUpdated;
   }
 
-  async deleteListing(sellerId: string, listingId: string): Promise<void> {
+  async deleteListing(sellerId: string, listingId: string) {
     this.logger.log(`Запрос на удаление предмета ${listingId}}`);
 
     const listing = await this.prismaService.listing.findUnique({
@@ -184,6 +210,7 @@ export class AppService {
       this.logger.log(
         `Предмет ${listing.itemId} успешно разблокирован в инвентаре`
       );
+      this.kafkaClient.emit('listing.deleted.v1', listingId);
     } catch (error: any) {
       this.logger.error(`Не удалось разблокировать предмет: ${error.message}`);
       throw new RpcBadRequestException(
@@ -191,7 +218,7 @@ export class AppService {
       );
     }
 
-    await this.prismaService.listing.delete({
+    return this.prismaService.listing.delete({
       where: {
         id: listingId,
       },

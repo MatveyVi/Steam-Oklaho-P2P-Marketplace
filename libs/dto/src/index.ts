@@ -10,3 +10,4 @@ export * from './lib/notifications/notifications.dto';
 export * from './lib/profile/profile-created.dto';
 export * from './lib/payment/payment.dto';
 export * from './lib/market/item-transfer.dto';
+export * from './lib/search/search.dto';

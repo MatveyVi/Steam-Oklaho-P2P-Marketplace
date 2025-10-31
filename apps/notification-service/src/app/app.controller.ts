@@ -7,7 +7,6 @@ import {
   PaymentWithdrawal,
   ProfileCreatedEvent,
 } from '@backend/dto';
-import { type Listing } from '@prisma/client';
 
 @Controller()
 export class AppController {
