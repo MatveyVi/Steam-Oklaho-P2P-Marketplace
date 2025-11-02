@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { ClientProxy } from '@nestjs/microservices';
 import { BaseItem, Listing, Profile } from '@prisma/client';
@@ -11,6 +16,8 @@ import {
   PaginationDto,
 } from '@backend/dto';
 import { plainToInstance } from 'class-transformer';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { type Cache } from 'cache-manager';
 
 @Injectable()
 export class MarketService {
@@ -19,7 +26,11 @@ export class MarketService {
     private readonly marketClient: ClientProxy,
     @Inject(MICROSERVICE_LIST.USER_SERVICE)
     private readonly userClient: ClientProxy,
-    private readonly httpService: HttpService
+    private readonly httpService: HttpService,
+    private readonly logger: Logger,
+
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache
   ) {}
 
   async getListingById(listingId: string) {
@@ -68,13 +79,7 @@ export class MarketService {
           sellerIds
         )
       ),
-      lastValueFrom(
-        this.httpService
-          .get<BaseItem[]>(`/items/by-ids`, {
-            params: { ids: baseItemsIds.join(',') },
-          })
-          .pipe(map((res) => res.data))
-      ),
+      Promise.all(baseItemsIds.map((id) => this.getItemFromCache(id))),
     ]);
     const data: ListingResponseDto[] = listings.map((listing) => {
       const seller = sellers.find((s) => s.userId === listing.sellerId);
@@ -93,6 +98,24 @@ export class MarketService {
       data,
       meta,
     };
+  }
+
+  private async getItemFromCache(externalId: string): Promise<BaseItem> {
+    const cacheKey = `item_catalog:${externalId}`;
+
+    const cachedItem = await this.cacheManager.get<BaseItem>(cacheKey);
+    if (cachedItem) {
+      this.logger.log(`BaseItem из Cache`);
+      return cachedItem;
+    }
+    this.logger.log(`В кеше нет BaseItem`);
+    const item = await lastValueFrom(
+      this.httpService
+        .get<BaseItem>(`/items/${externalId}`)
+        .pipe(map((res) => res.data))
+    );
+    await this.cacheManager.set(cacheKey, item, 1 * 60 * 60 * 1000);
+    return item;
   }
 
   async getUserListings(
