@@ -3,7 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { AuthController } from '../auth/auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { UserController } from '../users/user.controller';
@@ -14,6 +14,8 @@ import { InventoryService } from '../inventory/inventory.service';
 import { MarketController } from '../market/market.controller';
 import { MarketService } from '../market/market.service';
 import { PaymentController } from '../payment/payment.controller';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -21,6 +23,18 @@ import { PaymentController } from '../payment/payment.controller';
     PassportModule,
     HttpModule.register({
       baseURL: 'http://localhost:3003/api',
+    }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        store: async () =>
+          await redisStore({
+            url: configService.getOrThrow<string>('REDIS_URL'),
+            ttl: 300,
+          }),
+      }),
+      isGlobal: true,
     }),
     ClientsModule.register([
       {

@@ -16,6 +16,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^8.19.1",
     "@nestjs/axios": "^4.0.1",
+    "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.1.6",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.6",
@@ -27,6 +28,8 @@
     "@prisma/client": "^6.17.0",
     "argon2": "^0.44.0",
     "axios": "^1.6.0",
+    "cache-manager": "^7.2.4",
+    "cache-manager-redis-store": "^3.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
