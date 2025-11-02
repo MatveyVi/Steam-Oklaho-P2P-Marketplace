@@ -38,14 +38,12 @@ export class MarketService {
       this.marketClient.send('market.get-listing-by-id.v1', listingId)
     );
     if (!listing) throw new BadRequestException('Листинга не существует');
-    const [user, baseItemResponse] = await Promise.all([
+    const [user, baseItem] = await Promise.all([
       lastValueFrom(
         this.userClient.send('user.get-profile-by-id.v1', listing.sellerId)
       ),
-      lastValueFrom(this.httpService.get(`/items/${listing.externalId}`)),
+      this.getItemFromCache(listing.externalId),
     ]);
-
-    const baseItem: BaseItem = baseItemResponse.data;
 
     return plainToInstance(
       ListingResponseDto,
@@ -144,13 +142,7 @@ export class MarketService {
           sellerIds
         )
       ),
-      lastValueFrom(
-        this.httpService
-          .get<BaseItem[]>(`/items/by-ids`, {
-            params: { ids: baseItemsIds.join(',') },
-          })
-          .pipe(map((res) => res.data))
-      ),
+      Promise.all(baseItemsIds.map((id) => this.getItemFromCache(id))),
     ]);
     const data: ListingResponseDto[] = listings.map((listing) => {
       const seller = sellers.find((s) => s.userId === listing.sellerId);
