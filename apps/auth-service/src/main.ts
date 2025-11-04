@@ -2,13 +2,17 @@ import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
     options: {
-      port: 4001,
+      host: configService.getOrThrow('AUTH_SERVICE_HOST'),
+      port: +configService.getOrThrow('AUTH_SERVICE_PORT'),
     },
   });
 
@@ -18,11 +22,11 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
 
-  const port = process.env.PORT || 3001;
+  const port = configService.getOrThrow('AUTH_SERVICE_HTTP_PORT');
 
   await app.listen(port);
   Logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Auth Service is running on: http://localhost:${port}/${globalPrefix}`
   );
 }
 

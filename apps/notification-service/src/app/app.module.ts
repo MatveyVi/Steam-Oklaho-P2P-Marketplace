@@ -1,7 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HttpModule } from '@nestjs/axios';
 import { MICROSERVICE_LIST } from '@backend/constants';
@@ -12,33 +12,49 @@ import { ResendMailer } from './resend/resend.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    HttpModule.register({
-      baseURL: 'http://localhost:3003/api',
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        baseURL: configService.getOrThrow<string>('CATALOG_SERVICE_URL'),
+      }),
     }),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: MICROSERVICE_LIST.USER_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4005,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('USER_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('USER_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.PAYMENT_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4007,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('PAYMENT_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('PAYMENT_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.CATALOG_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4003,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('CATALOG_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('CATALOG_SERVICE_PORT'),
+          },
+        }),
       },
     ]),
   ],
