@@ -5,28 +5,44 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_LIST } from '@backend/constants';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ClientsModule.register([
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        baseURL: configService.getOrThrow<string>('CATALOG_SERVICE_URL'),
+      }),
+    }),
+    ClientsModule.registerAsync([
       {
         name: MICROSERVICE_LIST.USER_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4005,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('USER_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('USER_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.CATALOG_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4003,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('CATALOG_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('CATALOG_SERVICE_PORT'),
+          },
+        }),
       },
     ]),
     ElasticsearchModule.registerAsync({

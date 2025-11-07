@@ -5,21 +5,31 @@ import { DatabaseModule } from '@backend/database';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MICROSERVICE_LIST } from '@backend/constants';
 import { HttpModule } from '@nestjs/axios';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    HttpModule.register({
-      baseURL: 'http://localhost:3003/api',
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        baseURL: configService.getOrThrow<string>('CATALOG_SERVICE_URL'),
+      }),
     }),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: MICROSERVICE_LIST.CATALOG_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4003,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('CATALOG_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('CATALOG_SERVICE_PORT'),
+          },
+        }),
       },
     ]),
   ],

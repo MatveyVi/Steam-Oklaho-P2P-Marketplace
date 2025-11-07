@@ -12,7 +12,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
   constructor(configService: ConfigService) {
     super({
       jwtFromRequest: cookieExtractor,
-      secretOrKey: configService.getOrThrow<string>('JWT_REFRESH_SERCET'),
+      secretOrKey: configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
       ignoreExpiration: false,
     });
   }

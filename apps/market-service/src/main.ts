@@ -2,15 +2,17 @@ import { ClassSerializerInterceptor, Logger } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
     options: {
-      host: 'localhost',
-      port: 4006,
+      host: configService.getOrThrow('MARKET_SERVICE_HOST'),
+      port: +configService.getOrThrow('MARKET_SERVICE_PORT'),
     },
   });
 
@@ -20,7 +22,8 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
 
-  const port = process.env.PORT || 3006;
+  const port = configService.getOrThrow('MARKET_SERVICE_HTTP_PORT');
+
   await app.listen(port);
   Logger.log(
     `🚀 Market Service is running on: http://localhost:${port}/${globalPrefix}`

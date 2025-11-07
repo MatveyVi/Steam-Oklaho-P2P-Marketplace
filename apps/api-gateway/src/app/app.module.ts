@@ -19,11 +19,17 @@ import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
-    ConfigModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     PassportModule,
-    HttpModule.register({
-      baseURL: 'http://localhost:3003/api',
+
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        baseURL: configService.getOrThrow<string>('CATALOG_SERVICE_URL'),
+      }),
     }),
+
     CacheModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -36,63 +42,92 @@ import { redisStore } from 'cache-manager-redis-store';
       }),
       isGlobal: true,
     }),
-    ClientsModule.register([
+
+    ClientsModule.registerAsync([
       {
         name: MICROSERVICE_LIST.AUTH_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4001,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('AUTH_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('AUTH_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.USER_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4005,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('USER_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('USER_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.KAFKA_SERVICE,
-        transport: Transport.KAFKA,
-        options: {
-          client: {
-            brokers: ['localhost:29092'],
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              brokers: [configService.getOrThrow<string>('KAFKA_BROKER')],
+            },
           },
-        },
+        }),
       },
       {
         name: MICROSERVICE_LIST.INVENTORY_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4004,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('INVENTORY_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('INVENTORY_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.MARKET_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4006,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('MARKET_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('MARKET_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.PAYMENT_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4007,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('PAYMENT_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('PAYMENT_SERVICE_PORT'),
+          },
+        }),
       },
       {
         name: MICROSERVICE_LIST.SEARCH_SERVICE,
-        transport: Transport.TCP,
-        options: {
-          host: 'localhost',
-          port: 4009,
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: configService.getOrThrow<string>('SEARCH_SERVICE_HOST'),
+            port: +configService.getOrThrow<number>('SEARCH_SERVICE_PORT'),
+          },
+        }),
       },
     ]),
   ],
