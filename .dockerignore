@@ -1,0 +1,14 @@
+
+node_modules
+
+dist
+tmp
+
+.nx/cache
+
+.git
+.gitignore
+.dockerignore
+*.log
+.env*
+!/.env.example

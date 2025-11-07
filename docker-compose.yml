@@ -1,4 +1,25 @@
+# docker-compose.yml
+version: '3.8'
+
 services:
+  # -----------------------------------------------------------------
+  #  1. Инфраструктура (Базы, Брокеры, Кэш)
+  # -----------------------------------------------------------------
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432" # Пробрасываем порт на твой localhost
+    env_file:
+      - .env.docker # 👈 Использует .env.docker для POSTGRES_USER и т.д.
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   redpanda:
     image: redpandadata/redpanda:v25.2.1
     container_name: redpanda
@@ -14,24 +35,26 @@ services:
       - --kafka-addr=PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:29092
       - --advertise-kafka-addr=PLAINTEXT://redpanda:9092,OUTSIDE://localhost:29092
     ports:
-      - "9092:9092"  
-      - "29092:29092" 
+      - "9092:9092"
+      - "29092:29092"
     healthcheck:
       test: ["CMD", "bash", "-c", "rpk cluster info || exit 1"]
       interval: 5s
       timeout: 5s
       retries: 12
 
-  postgres: 
-    image: postgres:latest
-    container_name: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  redis:
+    image: redis:7-alpine
+    container_name: redis
     ports:
-      - "5432:5432"
+      - "6379:6379"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   es01:
     image: elasticsearch:8.14.3
@@ -43,25 +66,173 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" 
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
   kibana:
     image: kibana:8.14.3
     container_name: kibana
     ports:
-      - '5601:5601' 
+      - '5601:5601'
     environment:
       - ELASTICSEARCH_HOSTS=http://es01:9200
+    depends_on:
+      es01:
+        condition: service_healthy
 
-  redis:
-    image: redis:7-alpine
-    container_name: redis
+  # -----------------------------------------------------------------
+  #  2. Твои Приложения (Сервисы)
+  # -----------------------------------------------------------------
+
+  api-gateway:
+    build:
+      context: . # 👈 Говорим "ищи Dockerfile здесь, в корне"
+      args:
+        APP_NAME: api-gateway # 👈 Передаем APP_NAME в Dockerfile
+    container_name: api-gateway
+    env_file:
+      - .env.docker # 👈 Даем ему .env.docker
     ports:
-      - '6379:6379'
-    volumes:
-      - redisdata:/data
-  
-volumes: 
-  pgdata:
-  esdata:
-  redisdata:
+      - "3000:3000" # Пробрасываем HTTP порт (API_GATEWAY_PORT)
+    depends_on:
+      # 👈 Не запускать, пока не будут готовы...
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  auth-service:
+    build:
+      context: .
+      args:
+        APP_NAME: auth-service
+    container_name: auth-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3001:3001" # Пробрасываем HTTP порт (AUTH_SERVICE_HTTP_PORT)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: .
+      args:
+        APP_NAME: payment-service
+    container_name: payment-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3002:3002" # HTTP
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
+  catalog-service:
+    build:
+      context: .
+      args:
+        APP_NAME: catalog-service
+    container_name: catalog-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3003:3003" # HTTP
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  inventory-service:
+    build:
+      context: .
+      args:
+        APP_NAME: inventory-service
+    container_name: inventory-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3004:3004" # HTTP
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  user-service:
+    build:
+      context: .
+      args:
+        APP_NAME: user-service
+    container_name: user-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3005:3005" # HTTP
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
+  market-service:
+    build:
+      context: .
+      args:
+        APP_NAME: market-service
+    container_name: market-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3006:3006" # HTTP
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
+  search-service:
+    build:
+      context: .
+      args:
+        APP_NAME: search-service
+    container_name: search-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3008:3008" # HTTP
+    depends_on:
+      es01:
+        condition: service_healthy
+      redpanda:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: .
+      args:
+        APP_NAME: notification-service
+    container_name: notification-service
+    env_file:
+      - .env.docker
+    ports:
+      - "3009:3009" # HTTP
+    depends_on:
+      redpanda:
+        condition: service_healthy
+
+# -----------------------------------------------------------------
+#  3. Тома (Volumes) - Хранилища данных
+# -----------------------------------------------------------------
+volumes:
+  pgdata: {}
+  esdata: {}
+  redisdata: {}
