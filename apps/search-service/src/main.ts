@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const host = configService.getOrThrow('SEARCH_SERVICE_HOST');
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
@@ -23,7 +24,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
     options: {
-      host: configService.getOrThrow('SEARCH_SERVICE_HOST'),
+      host: host,
       port: +configService.getOrThrow('SEARCH_SERVICE_PORT'),
     },
   });
@@ -35,9 +36,9 @@ async function bootstrap() {
 
   const port = configService.getOrThrow('SEARCH_SERVICE_HTTP_PORT');
 
-  await app.listen(port);
+  await app.listen(port, host);
   Logger.log(
-    `🚀 Search Service is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Search Service is running on: http://${host}:${port}/${globalPrefix}`
   );
 }
 

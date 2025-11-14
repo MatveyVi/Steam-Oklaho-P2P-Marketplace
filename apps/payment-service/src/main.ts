@@ -8,11 +8,12 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const host = configService.getOrThrow('PAYMENT_SERVICE_HOST');
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
     options: {
-      host: configService.getOrThrow('PAYMENT_SERVICE_HOST'),
+      host: host,
       port: +configService.getOrThrow('PAYMENT_SERVICE_PORT'),
     },
   });
@@ -44,9 +45,9 @@ async function bootstrap() {
     })
   );
 
-  await app.listen(port);
+  await app.listen(port, host);
   Logger.log(
-    `🚀 Payment Service is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Payment Service is running on: http://${host}:${port}/${globalPrefix}`
   );
 }
 

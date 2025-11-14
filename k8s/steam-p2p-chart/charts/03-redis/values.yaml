@@ -1,0 +1,10 @@
+enabled: true
+nameOverride: redis
+image:
+  repository: redis
+  tag: 7-alpine
+  pullPolicy: IfNotPresent 
+
+service:
+  type: ClusterIP
+  port: 6379

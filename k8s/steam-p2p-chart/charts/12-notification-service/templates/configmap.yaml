@@ -1,0 +1,17 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.nameOverride }}-config
+data:
+  {{- if .Values.service.targetHttpPort }}
+  NOTIFICATION_SERVICE_HTTP_PORT: {{ .Values.service.targetHttpPort | quote }}
+  {{- end }}
+  {{- if .Values.service.targetTcpPort }}
+  NOTIFICATION_SERVICE_PORT: {{ .Values.service.targetTcpPort | quote }}
+  {{- end }}
+
+  {{- range $key, $value := .Values.configMap }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}

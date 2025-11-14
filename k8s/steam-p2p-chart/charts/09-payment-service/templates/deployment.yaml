@@ -1,0 +1,35 @@
+{{- if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.nameOverride }}-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.nameOverride }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nameOverride }}
+    spec:
+      containers:
+        - name: {{ .Values.nameOverride }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetHttpPort }}
+            - containerPort: {{ .Values.service.targetTcpPort }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.nameOverride }}-config
+            - secretRef:
+                name: {{ .Values.nameOverride }}-secret
+            # ❗️ "Зависимость" (Dependency) от 'postgres'
+            - secretRef:
+                name: postgres-secret
+          env:
+            # ❗️ "Собираем" (Build) 'DATABASE_URL'
+            - name: DATABASE_URL
+              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)?schema=public"
+{{- end }}

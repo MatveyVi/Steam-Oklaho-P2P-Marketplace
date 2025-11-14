@@ -1,0 +1,26 @@
+enabled: true
+
+image:
+  repository: postgres 
+  tag: latest          
+  pullPolicy: IfNotPresent 
+
+
+secrets:
+  name: postgres-secret
+  user: "default-user"
+  password: "default-password"
+  database: "default-db"
+
+persistence:
+  claimName: postgres-pv-claim
+  accessMode: ReadWriteOnce
+  size: 5Gi
+
+
+service:
+  type: ClusterIP 
+  port: 5432       
+
+
+nameOverride: postgres

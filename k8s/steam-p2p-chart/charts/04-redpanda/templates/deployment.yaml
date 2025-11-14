@@ -1,0 +1,47 @@
+{{- if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.nameOverride }}-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.nameOverride }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nameOverride }}
+    spec:
+      containers:
+        - name: {{ .Values.nameOverride }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          # ❗️ 'Redpanda' "требует" (requires) эти 'args' для 'minikube'
+          args:
+            - redpanda
+            - start
+            - --kafka-addr 0.0.0.0:9092
+            - --advertise-kafka-addr $(POD_IP):9092
+            - --pandaproxy-addr 0.0.0.0:8082
+            - --advertise-pandaproxy-addr $(POD_IP):8082
+            - --rpc-addr 0.0.0.0:33145
+            - --advertise-rpc-addr $(POD_IP):33145
+            - --smp 1
+            - --memory 1G
+            - --mode dev-container
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: redpanda-storage
+              mountPath: /var/lib/redpanda
+      volumes:
+        - name: redpanda-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.claimName }}
+{{- end }}

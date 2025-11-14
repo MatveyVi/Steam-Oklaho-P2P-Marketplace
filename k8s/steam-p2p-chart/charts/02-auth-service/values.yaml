@@ -1,0 +1,30 @@
+enabled: true
+
+
+image:
+  repository: backend-auth-service 
+  tag: latest
+  pullPolicy: IfNotPresent 
+
+nameOverride: auth-service
+
+service:
+  type: ClusterIP
+  httpPort: 3001 
+  tcpPort: 4001 
+  
+  targetHttpPort: 3001
+  targetTcpPort: 4001
+
+
+configMap:
+  AUTH_SERVICE_HOST: "0.0.0.0" 
+  KAFKA_BROKER: "redpanda:9092"
+  KAFKA_ENABLED: "true" 
+
+
+secrets:
+  JWT_ACCESS_SECRET: "default-access-secret"
+  JWT_REFRESH_SECRET: "default-refresh-secret"
+  JWT_ACCESS_EXPIRATION: "15m"
+  JWT_REFRESH_EXPIRATION: "7d"

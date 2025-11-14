@@ -1,0 +1,27 @@
+enabled: true
+nameOverride: catalog-service
+image:
+  repository: backend-catalog-service 
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  httpPort: 3003
+  tcpPort: 4003
+  targetHttpPort: 3003
+  targetTcpPort: 4003
+
+
+configMap:
+  CATALOG_SERVICE_HOST: "0.0.0.0" 
+  KAFKA_BROKER: "redpanda:9092"
+  KAFKA_ENABLED: "true" 
+  REDIS_URL: "redis://redis:6379"
+  REDIS_ENABLED: "true" 
+  ELASTICSEARCH_NODE: "http://elasticsearch:9200" 
+  ELASTICSEARCH_ENABLED: "true" 
+  
+
+secrets:
+  

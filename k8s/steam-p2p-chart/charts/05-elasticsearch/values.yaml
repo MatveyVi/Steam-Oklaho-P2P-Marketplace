@@ -1,0 +1,15 @@
+enabled: true
+nameOverride: elasticsearch
+image:
+  repository: elasticsearch
+  tag: 8.14.3 
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 9200
+
+persistence:
+  claimName: es-pv-claim
+  accessMode: ReadWriteOnce
+  size: 5Gi

@@ -1,0 +1,30 @@
+enabled: true
+nameOverride: payment-service
+image:
+  repository: backend-payment-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  httpPort: 3002
+  tcpPort: 4007
+  targetHttpPort: 3002
+  targetTcpPort: 4007
+
+configMap:
+  PAYMENT_SERVICE_HOST: "0.0.0.0"
+  KAFKA_BROKER: "redpanda:9092"
+  KAFKA_ENABLED: "true"
+  REDIS_URL: "redis://redis:6379"
+  REDIS_ENABLED: "true"
+  ELASTICSEARCH_NODE: "http://elasticsearch:9200"
+  ELASTICSEARCH_ENABLED: "true"
+  
+secrets:
+  JWT_ACCESS_SECRET: "default-access"
+  JWT_REFRESH_SECRET: "default-refresh"
+  STRIPE_SECRET_KEY: "default-stripe"
+  STRIPE_WEBHOOK_SECRET: "default-webhook"
+  RESEND_API_KEY: "default-resend"
+  RESEND_EMAIL: "default-email"

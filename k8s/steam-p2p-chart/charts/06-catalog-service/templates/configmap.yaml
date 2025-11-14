@@ -1,0 +1,12 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.nameOverride }}-config
+data:
+  CATALOG_SERVICE_HTTP_PORT: {{ .Values.service.targetHttpPort | quote }}
+  CATALOG_SERVICE_PORT: {{ .Values.service.targetTcpPort | quote }}
+  {{- range $key, $value := .Values.configMap }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
