@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const host = configService.getOrThrow('NOTIFICATION_SERVICE_HOST');
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.KAFKA,
@@ -27,9 +28,9 @@ async function bootstrap() {
 
   const port = configService.getOrThrow('NOTIFICATION_SERVICE_HTTP_PORT');
 
-  await app.listen(port);
+  await app.listen(port, host);
   Logger.log(
-    `🚀 Notification Service is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 Notification Service is running on: http://${host}:${port}/${globalPrefix}`
   );
 }
 

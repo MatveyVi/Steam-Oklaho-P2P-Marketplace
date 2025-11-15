@@ -22,10 +22,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const port = configService.getOrThrow('API_GATEWAY_PORT');
+  const host = configService.getOrThrow('API_GATEWAY_HOST');
 
-  await app.listen(port);
+  await app.listen(port, host);
   Logger.log(
-    `🚀 GateWay Service is running on: http://localhost:${port}/${globalPrefix}`
+    `🚀 GateWay Service is running on: http://${host}:${port}/${globalPrefix}`
   );
 }
 

@@ -1,0 +1,28 @@
+enabled: true
+nameOverride: market-service
+image:
+  repository: backend-market-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  httpPort: 3006
+  tcpPort: 4006
+  targetHttpPort: 3006
+  targetTcpPort: 4006
+
+configMap:
+  MARKET_SERVICE_HOST: "0.0.0.0"
+  KAFKA_BROKER: "redpanda:9092"
+  KAFKA_ENABLED: "true"
+  REDIS_URL: "redis://redis:6379"
+  REDIS_ENABLED: "true"
+  ELASTICSEARCH_NODE: "http://elasticsearch:9200"
+  ELASTICSEARCH_ENABLED: "true"
+  INVENTORY_SERVICE_HOST: "inventory-service"
+  PAYMENT_SERVICE_HOST: "payment-service"
+  
+secrets:
+  JWT_ACCESS_SECRET: "default-access"
+  JWT_REFRESH_SECRET: "default-refresh"

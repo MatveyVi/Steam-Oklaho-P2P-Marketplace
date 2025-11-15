@@ -90,16 +90,15 @@ services:
 
   api-gateway:
     build:
-      context: . # 👈 Говорим "ищи Dockerfile здесь, в корне"
+      context: .
       args:
-        APP_NAME: api-gateway # 👈 Передаем APP_NAME в Dockerfile
+        APP_NAME: api-gateway
     container_name: api-gateway
     env_file:
-      - .env.docker # 👈 Даем ему .env.docker
+      - .env.docker 
     ports:
-      - "3000:3000" # Пробрасываем HTTP порт (API_GATEWAY_PORT)
+      - "3000:3000" 
     depends_on:
-      # 👈 Не запускать, пока не будут готовы...
       postgres:
         condition: service_healthy
       redpanda:

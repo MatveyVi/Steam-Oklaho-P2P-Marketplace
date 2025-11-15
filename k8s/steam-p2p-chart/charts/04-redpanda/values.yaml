@@ -1,0 +1,15 @@
+enabled: true
+nameOverride: redpanda
+image:
+  repository: docker.redpanda.com/redpandadata/redpanda
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 9092
+
+persistence:
+  claimName: redpanda-pv-claim
+  accessMode: ReadWriteOnce
+  size: 5Gi

@@ -1,0 +1,31 @@
+enabled: true
+nameOverride: notification-service
+image:
+  repository: backend-notification-service
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  httpPort: 3009
+  targetHttpPort: 3009
+
+configMap:
+  NOTIFICATION_SERVICE_HOST: "0.0.0.0"
+  KAFKA_BROKER: "redpanda:9092"
+  KAFKA_ENABLED: "true"
+  REDIS_URL: "redis://redis:6379"
+  REDIS_ENABLED: "true"
+  ELASTICSEARCH_NODE: "http://elasticsearch:9200"
+  ELASTICSEARCH_ENABLED: "true"
+  CATALOG_SERVICE_URL: "http://catalog-service:3003/api"
+  CATALOG_SERVICE_HOST: "catalog-service"
+  INVENTORY_SERVICE_HOST: "inventory-service"
+  USER_SERVICE_HOST: "user-service"
+  PAYMENT_SERVICE_HOST: "payment-service"
+  
+secrets:
+  JWT_ACCESS_SECRET: "default-access"
+  JWT_REFRESH_SECRET: "default-refresh"
+  RESEND_API_KEY: "default-resend"
+  RESEND_EMAIL: "default-email"

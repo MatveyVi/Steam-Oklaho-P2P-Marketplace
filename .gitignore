@@ -46,3 +46,9 @@ Thumbs.db
 .github/instructions/nx.instructions.md
 
 /generated/prisma
+
+k8s/values-local.*
+k8/svalues-staging.*
+k8s/values-production.*
+
+k8s/steam-p2p-chart/charts/*.tgz

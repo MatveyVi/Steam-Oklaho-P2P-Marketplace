@@ -54,7 +54,6 @@ export class AppService {
     );
 
     this.kafkaClient.emit('user.registered.v1', eventPayload);
-
     return tokens;
   }
 

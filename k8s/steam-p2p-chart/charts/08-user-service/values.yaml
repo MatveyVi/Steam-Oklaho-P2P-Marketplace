@@ -1,0 +1,26 @@
+enabled: true
+nameOverride: user-service
+image:
+  repository: backend-user-service # ❗️ Имя
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  httpPort: 3005 # ❗️ Порт
+  tcpPort: 4005  # ❗️ Порт
+  targetHttpPort: 3005
+  targetTcpPort: 4005
+
+configMap:
+  USER_SERVICE_HOST: "0.0.0.0"
+  KAFKA_BROKER: "redpanda:9092"
+  KAFKA_ENABLED: "true"
+  REDIS_URL: "redis://redis:6379"
+  REDIS_ENABLED: "true"
+  ELASTICSEARCH_NODE: "http://elasticsearch:9200"
+  ELASTICSEARCH_ENABLED: "true"
+  
+secrets:
+  JWT_ACCESS_SECRET: "default-access"
+  JWT_REFRESH_SECRET: "default-refresh"

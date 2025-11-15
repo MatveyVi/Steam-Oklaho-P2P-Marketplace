@@ -1,0 +1,39 @@
+{{- if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.nameOverride }}-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.nameOverride }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.nameOverride }}
+    spec:
+      containers:
+        - name: {{ .Values.nameOverride }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            # ❗️ "Критично" (Critical) для 'minikube'
+            - name: discovery.type
+              value: single-node
+            # ❗️ "Отключаем" (Disable) 'security'
+            - name: xpack.security.enabled
+              value: "false"
+            # ❗️ "Даем" (Give) 'ES' меньше 'RAM'
+            - name: "ES_JAVA_OPTS"
+              value: "-Xms512m -Xmx512m"
+          volumeMounts:
+            - name: es-storage
+              mountPath: /usr/share/elasticsearch/data
+      volumes:
+        - name: es-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.claimName }}
+{{- end }}
