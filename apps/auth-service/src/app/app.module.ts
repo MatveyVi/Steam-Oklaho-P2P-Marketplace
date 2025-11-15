@@ -12,21 +12,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
     BackendJwtModule,
-    // ClientsModule.registerAsync([
-    //   {
-    //     name: MICROSERVICE_LIST.KAFKA_SERVICE,
-    //     imports: [ConfigModule],
-    //     inject: [ConfigService],
-    //     useFactory: (configService: ConfigService) => ({
-    //       transport: Transport.KAFKA,
-    //       options: {
-    //         client: {
-    //           brokers: [configService.getOrThrow<string>('KAFKA_BROKER')],
-    //         },
-    //       },
-    //     }),
-    //   },
-    // ]),
+    ClientsModule.registerAsync([
+      {
+        name: MICROSERVICE_LIST.KAFKA_SERVICE,
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              brokers: [configService.getOrThrow<string>('KAFKA_BROKER')],
+            },
+          },
+        }),
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],

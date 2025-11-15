@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prisma-migration-job
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: prisma-migrations 
+          image: prisma-migration:latest  
+          imagePullPolicy: Never
+
+          envFrom:  
+            - secretRef:
+                name: postgres-secret 
+          
+          command:
+            - sh
+            - -c
+            - |
+              echo "Running Prisma push..."
+              # ❗️ 2. Собираем полную строку DATABASE_URL из компонентов
+              # Переменные $(POSTGRES_USER) и т.д. теперь доступны в shell
+              export DATABASE_URL="postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)?schema=public"
+              
+              # 3. Запускаем миграцию, используя собранную переменную
+              npx prisma db push --accept-data-loss
